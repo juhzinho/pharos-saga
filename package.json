@@ -1,0 +1,27 @@
+{
+  "name": "pharos-saga",
+  "version": "1.0.0",
+  "description": "Saga Executor for Pharos Pacific: wrap → approve → FaroSwap swap → approve → Morpho deposit, every step receipt-verified, with a defined retry policy, compensation and a state log.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": { "node": ">=20.12" },
+  "scripts": {
+    "saga": "node tasks/saga/saga.js",
+    "fork": "node scripts/fork.js",
+    "web": "node scripts/dev-server.js",
+    "test": "node --test test/*.test.js",
+    "test:fork": "node test/fork-e2e.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "viem": "^2.57.5"
+  },
+  "optionalDependencies": {
+    "@foundry-rs/anvil-win32-amd64": "1.7.1",
+    "@foundry-rs/anvil-linux-amd64": "1.7.1",
+    "@foundry-rs/anvil-linux-arm64": "1.7.1",
+    "@foundry-rs/anvil-darwin-amd64": "1.7.1",
+    "@foundry-rs/anvil-darwin-arm64": "1.7.1"
+  }
+}

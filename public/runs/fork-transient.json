@@ -1,0 +1,678 @@
+{
+ "name": "fork-transient",
+ "id": "proof-transient",
+ "events": [
+  {
+   "seq": 1,
+   "t": "2026-11-03T19:47:03.717Z",
+   "saga": "proof-transient",
+   "event": "saga.start",
+   "network": "fork",
+   "account": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+   "params": {
+    "amount": "2000000000000000000",
+    "vault": {
+     "id": "rock",
+     "name": "RockawayX USDC (Morpho)",
+     "symbol": "roxUSDC",
+     "address": "0x047cD0a91E9B92ED979189a6C8A120bf280f02E5"
+    },
+    "slippageBps": 100,
+    "compensation": "unwind",
+    "fail": null,
+    "maxFeeGwei": 50,
+    "maxAttempts": 4,
+    "signer": "local-key"
+   },
+   "plan": [
+    {
+     "id": "wrap",
+     "title": "Wrap 2 PROS into WPROS"
+    },
+    {
+     "id": "approve-wpros",
+     "title": "Approve FaroSwap (DODOApprove 0xBF10…849c) to spend 2 WPROS"
+    },
+    {
+     "id": "swap",
+     "title": "Swap 2 WPROS → USDC on FaroSwap (0.01% pool 0x912c…f647)"
+    },
+    {
+     "id": "approve-usdc",
+     "title": "Approve RockawayX USDC (Morpho) to spend the USDC received in step 3"
+    },
+    {
+     "id": "deposit",
+     "title": "Deposit the USDC received in step 3 into RockawayX USDC (Morpho)"
+    }
+   ],
+   "start": {
+    "pros": "9997985141074435210497",
+    "wpros": "6111613113899730",
+    "usdc": "0",
+    "shares": "1036228859964327176"
+   }
+  },
+  {
+   "seq": 2,
+   "t": "2026-11-03T19:47:03.722Z",
+   "saga": "proof-transient",
+   "event": "step.start",
+   "step": "wrap",
+   "attempt": 1,
+   "title": "Wrap 2 PROS into WPROS"
+  },
+  {
+   "seq": 3,
+   "t": "2026-11-03T19:47:03.729Z",
+   "saga": "proof-transient",
+   "event": "step.simulated",
+   "step": "wrap",
+   "gasEstimate": "27842",
+   "gasLimit": "36194",
+   "note": null
+  },
+  {
+   "seq": 4,
+   "t": "2026-11-03T19:47:03.774Z",
+   "saga": "proof-transient",
+   "event": "tx.sent",
+   "step": "wrap",
+   "hash": "0x42251fc3ca0a013b44ac294baff437cbfb92db0c6d08caedd0e0b1403db812e3",
+   "nonce": 24,
+   "maxFeePerGas": "2384935630",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "36194",
+   "replaces": null,
+   "built": {
+    "to": "0x52C48d4213107b20bC583832b0d951FB9CA8F0B0",
+    "data": "0xd0e30db0",
+    "value": "2000000000000000000",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 5,
+   "t": "2026-11-03T19:47:03.779Z",
+   "saga": "proof-transient",
+   "event": "receipt",
+   "step": "wrap",
+   "hash": "0x42251fc3ca0a013b44ac294baff437cbfb92db0c6d08caedd0e0b1403db812e3",
+   "block": "22037837",
+   "gasUsed": "27842",
+   "effectiveGasPrice": "1605915904",
+   "status": "success"
+  },
+  {
+   "seq": 6,
+   "t": "2026-11-03T19:47:03.786Z",
+   "saga": "proof-transient",
+   "event": "step.verified",
+   "step": "wrap",
+   "checks": [
+    {
+     "label": "WPROS Deposit event",
+     "ok": true,
+     "detail": "wad 2000000000000000000"
+    },
+    {
+     "label": "WPROS balance +amount",
+     "ok": true,
+     "detail": "0.006111 WPROS → 2.006111 WPROS"
+    }
+   ],
+   "facts": {
+    "wrapped": "2000000000000000000"
+   }
+  },
+  {
+   "seq": 7,
+   "t": "2026-11-03T19:47:03.788Z",
+   "saga": "proof-transient",
+   "event": "step.start",
+   "step": "approve-wpros",
+   "attempt": 1,
+   "title": "Approve FaroSwap (DODOApprove 0xBF10…849c) to spend 2 WPROS"
+  },
+  {
+   "seq": 8,
+   "t": "2026-11-03T19:47:03.794Z",
+   "saga": "proof-transient",
+   "event": "step.simulated",
+   "step": "approve-wpros",
+   "gasEstimate": "46111",
+   "gasLimit": "59944",
+   "note": null
+  },
+  {
+   "seq": 9,
+   "t": "2026-11-03T19:47:03.801Z",
+   "saga": "proof-transient",
+   "event": "tx.sent",
+   "step": "approve-wpros",
+   "hash": "0xdd0745c3a32e7a0e11ecaae4e7e447cbcd08034a10e51675507b5ca1c4ef05c2",
+   "nonce": 25,
+   "maxFeePerGas": "2211831808",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "59944",
+   "replaces": null,
+   "built": {
+    "to": "0x52C48d4213107b20bC583832b0d951FB9CA8F0B0",
+    "data": "0x095ea7b3000000000000000000000000bf105f4ffbd3825f5433d074008b9a76237d849c0000000000000000000000000000000000000000000000001bc16d674ec80000",
+    "value": "0",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 10,
+   "t": "2026-11-03T19:47:03.802Z",
+   "saga": "proof-transient",
+   "event": "inject",
+   "step": "approve-wpros",
+   "kind": "rpc",
+   "detail": "broadcast failed with 503 Service Unavailable before reaching the node"
+  },
+  {
+   "seq": 11,
+   "t": "2026-11-03T19:47:03.803Z",
+   "saga": "proof-transient",
+   "event": "step.failed",
+   "step": "approve-wpros",
+   "kind": "rpc",
+   "transient": true,
+   "message": "503 Service Unavailable (injected)",
+   "attempt": 1
+  },
+  {
+   "seq": 12,
+   "t": "2026-11-03T19:47:03.804Z",
+   "saga": "proof-transient",
+   "event": "step.retry",
+   "step": "approve-wpros",
+   "delayMs": 1560,
+   "nextAttempt": 2
+  },
+  {
+   "seq": 13,
+   "t": "2026-11-03T19:47:05.368Z",
+   "saga": "proof-transient",
+   "event": "step.start",
+   "step": "approve-wpros",
+   "attempt": 2,
+   "title": "Approve FaroSwap (DODOApprove 0xBF10…849c) to spend 2 WPROS"
+  },
+  {
+   "seq": 14,
+   "t": "2026-11-03T19:47:05.781Z",
+   "saga": "proof-transient",
+   "event": "tx.dropped",
+   "step": "approve-wpros",
+   "hash": "0xdd0745c3a32e7a0e11ecaae4e7e447cbcd08034a10e51675507b5ca1c4ef05c2",
+   "detail": "never mined and its nonce is still free, so sending again is safe"
+  },
+  {
+   "seq": 15,
+   "t": "2026-11-03T19:47:05.791Z",
+   "saga": "proof-transient",
+   "event": "step.simulated",
+   "step": "approve-wpros",
+   "gasEstimate": "46111",
+   "gasLimit": "59944",
+   "note": null
+  },
+  {
+   "seq": 16,
+   "t": "2026-11-03T19:47:05.804Z",
+   "saga": "proof-transient",
+   "event": "tx.sent",
+   "step": "approve-wpros",
+   "hash": "0xdd0745c3a32e7a0e11ecaae4e7e447cbcd08034a10e51675507b5ca1c4ef05c2",
+   "nonce": 25,
+   "maxFeePerGas": "2211831808",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "59944",
+   "replaces": null,
+   "built": {
+    "to": "0x52C48d4213107b20bC583832b0d951FB9CA8F0B0",
+    "data": "0x095ea7b3000000000000000000000000bf105f4ffbd3825f5433d074008b9a76237d849c0000000000000000000000000000000000000000000000001bc16d674ec80000",
+    "value": "0",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 17,
+   "t": "2026-11-03T19:47:05.812Z",
+   "saga": "proof-transient",
+   "event": "receipt",
+   "step": "approve-wpros",
+   "hash": "0xdd0745c3a32e7a0e11ecaae4e7e447cbcd08034a10e51675507b5ca1c4ef05c2",
+   "block": "22037838",
+   "gasUsed": "46111",
+   "effectiveGasPrice": "1530180634",
+   "status": "success"
+  },
+  {
+   "seq": 18,
+   "t": "2026-11-03T19:47:05.815Z",
+   "saga": "proof-transient",
+   "event": "step.verified",
+   "step": "approve-wpros",
+   "checks": [
+    {
+     "label": "Approval event WPROS → 0xBF10…849c",
+     "ok": true,
+     "detail": "value 2000000000000000000"
+    },
+    {
+     "label": "allowance at block 22037838",
+     "ok": true,
+     "detail": "2000000000000000000 (expected 2000000000000000000)"
+    }
+   ],
+   "facts": {}
+  },
+  {
+   "seq": 19,
+   "t": "2026-11-03T19:47:05.816Z",
+   "saga": "proof-transient",
+   "event": "step.start",
+   "step": "swap",
+   "attempt": 1,
+   "title": "Swap 2 WPROS → USDC on FaroSwap (0.01% pool 0x912c…f647)"
+  },
+  {
+   "seq": 20,
+   "t": "2026-11-03T19:47:05.828Z",
+   "saga": "proof-transient",
+   "event": "step.simulated",
+   "step": "swap",
+   "gasEstimate": "239511",
+   "gasLimit": "311364",
+   "note": "quote 1.045133 USDC · min 1.034681 USDC"
+  },
+  {
+   "seq": 21,
+   "t": "2026-11-03T19:47:05.836Z",
+   "saga": "proof-transient",
+   "event": "tx.sent",
+   "step": "swap",
+   "hash": "0x97bd205e8f85327200e4ff52046c5c39abdc6a61e87553190599a310a43e90ab",
+   "nonce": 26,
+   "maxFeePerGas": "2060361268",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "311364",
+   "replaces": null,
+   "built": {
+    "to": "0xA5cA5Fbe34e444F366B373170541ec6902b0F75c",
+    "data": "0xff84aafa00000000000000000000000052c48d4213107b20bc583832b0d951fb9ca8f0b0000000000000000000000000c879c018db60520f4355c26ed1a6d572cdac18150000000000000000000000000000000000000000000000001bc16d674ec8000000000000000000000000000000000000000000000000000000000000000ff28d00000000000000000000000000000000000000000000000000000000000fc9b9000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002600000000000000000000000000000000000000000000000000000000000000380000000000000000000000000000000000000000000000000000000006aea3ee900000000000000000000000000000000000000000000000000000000000000010000000000000000000000004fd44181839d24e7c8f4d1b9288379109ec25fae0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000912c9ade24d44d8922f0866d8dcb079f1363f64700000000000000000000000000000000000000000000000000000000000000020000000000000000000000004fd44181839d24e7c8f4d1b9288379109ec25fae000000000000000000000000a5ca5fbe34e444f366b373170541ec6902b0f75c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006000000000000000000000000052c48d4213107b20bc583832b0d951fb9ca8f0b0000000000000000000000000c879c018db60520f4355c26ed1a6d572cdac18150000000000000000000000000000000000000000000000000000000000000064000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "value": "0",
+    "note": "quote 1.045133 USDC · min 1.034681 USDC",
+    "meta": {
+     "quoted": "1045133",
+     "min": "1034681"
+    }
+   }
+  },
+  {
+   "seq": 22,
+   "t": "2026-11-03T19:47:05.837Z",
+   "saga": "proof-transient",
+   "event": "inject",
+   "step": "swap",
+   "kind": "drop",
+   "detail": "signed but never broadcast, as if the mempool dropped it"
+  },
+  {
+   "seq": 23,
+   "t": "2026-11-03T19:47:12.683Z",
+   "saga": "proof-transient",
+   "event": "tx.dropped",
+   "step": "swap",
+   "hash": "0x97bd205e8f85327200e4ff52046c5c39abdc6a61e87553190599a310a43e90ab",
+   "detail": "no receipt after 6 s and nonce 26 is still free: replacing it with the same nonce and +20% fees, so only one can ever be mined"
+  },
+  {
+   "seq": 24,
+   "t": "2026-11-03T19:47:12.689Z",
+   "saga": "proof-transient",
+   "event": "tx.sent",
+   "step": "swap",
+   "hash": "0x373bf75c79e1c85089b533dabbc50aacea77f85bd5b1b06fc5d9c59891ebffae",
+   "nonce": 26,
+   "maxFeePerGas": "2472433522",
+   "maxPriorityFeePerGas": "1200000000",
+   "gas": "311364",
+   "replaces": "0x97bd205e8f85327200e4ff52046c5c39abdc6a61e87553190599a310a43e90ab",
+   "built": {
+    "to": "0xA5cA5Fbe34e444F366B373170541ec6902b0F75c",
+    "data": "0xff84aafa00000000000000000000000052c48d4213107b20bc583832b0d951fb9ca8f0b0000000000000000000000000c879c018db60520f4355c26ed1a6d572cdac18150000000000000000000000000000000000000000000000001bc16d674ec8000000000000000000000000000000000000000000000000000000000000000ff28d00000000000000000000000000000000000000000000000000000000000fc9b9000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002600000000000000000000000000000000000000000000000000000000000000380000000000000000000000000000000000000000000000000000000006aea3ee900000000000000000000000000000000000000000000000000000000000000010000000000000000000000004fd44181839d24e7c8f4d1b9288379109ec25fae0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000912c9ade24d44d8922f0866d8dcb079f1363f64700000000000000000000000000000000000000000000000000000000000000020000000000000000000000004fd44181839d24e7c8f4d1b9288379109ec25fae000000000000000000000000a5ca5fbe34e444f366b373170541ec6902b0f75c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006000000000000000000000000052c48d4213107b20bc583832b0d951fb9ca8f0b0000000000000000000000000c879c018db60520f4355c26ed1a6d572cdac18150000000000000000000000000000000000000000000000000000000000000064000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "value": "0",
+    "note": "quote 1.045133 USDC · min 1.034681 USDC",
+    "meta": {
+     "quoted": "1045133",
+     "min": "1034681"
+    }
+   }
+  },
+  {
+   "seq": 25,
+   "t": "2026-11-03T19:47:13.044Z",
+   "saga": "proof-transient",
+   "event": "receipt",
+   "step": "swap",
+   "hash": "0x373bf75c79e1c85089b533dabbc50aacea77f85bd5b1b06fc5d9c59891ebffae",
+   "block": "22037839",
+   "gasUsed": "194911",
+   "effectiveGasPrice": "1663914167",
+   "status": "success"
+  },
+  {
+   "seq": 26,
+   "t": "2026-11-03T19:47:13.056Z",
+   "saga": "proof-transient",
+   "event": "step.verified",
+   "step": "swap",
+   "checks": [
+    {
+     "label": "WPROS left the wallet",
+     "ok": true,
+     "detail": "2 WPROS"
+    },
+    {
+     "label": "USDC Transfer to the wallet",
+     "ok": true,
+     "detail": "1.045133 USDC"
+    },
+    {
+     "label": "received ≥ min (1.034681 USDC)",
+     "ok": true,
+     "detail": "received 1.045133 USDC (quote 1.045133 USDC)"
+    }
+   ],
+   "facts": {
+    "usdcOut": "1045133",
+    "swapQuote": "1045133"
+   }
+  },
+  {
+   "seq": 27,
+   "t": "2026-11-03T19:47:13.058Z",
+   "saga": "proof-transient",
+   "event": "step.start",
+   "step": "approve-usdc",
+   "attempt": 1,
+   "title": "Approve RockawayX USDC (Morpho) to spend 1.045133 USDC"
+  },
+  {
+   "seq": 28,
+   "t": "2026-11-03T19:47:13.070Z",
+   "saga": "proof-transient",
+   "event": "inject",
+   "step": "approve-usdc",
+   "kind": "gas",
+   "detail": "base fee forced to 200 gwei on the fork for 9 s"
+  },
+  {
+   "seq": 29,
+   "t": "2026-11-03T19:47:13.073Z",
+   "saga": "proof-transient",
+   "event": "step.simulated",
+   "step": "approve-usdc",
+   "gasEstimate": "55819",
+   "gasLimit": "72564",
+   "note": null
+  },
+  {
+   "seq": 30,
+   "t": "2026-11-03T19:47:13.076Z",
+   "saga": "proof-transient",
+   "event": "gas.wait",
+   "step": "approve-usdc",
+   "baseFeeGwei": "200",
+   "capGwei": "50",
+   "detail": "base fee above the cap; waiting (does not use an attempt)"
+  },
+  {
+   "seq": 31,
+   "t": "2026-11-03T19:47:22.120Z",
+   "saga": "proof-transient",
+   "event": "tx.sent",
+   "step": "approve-usdc",
+   "hash": "0x6d72f4ee9c967eda0542858bf9ad07d6f63f436db3a6501e7a1c573fdf341339",
+   "nonce": 27,
+   "maxFeePerGas": "21000000000",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "72564",
+   "replaces": null,
+   "built": {
+    "to": "0xC879C018dB60520F4355C26eD1a6D572cdAC1815",
+    "data": "0x095ea7b3000000000000000000000000047cd0a91e9b92ed979189a6c8a120bf280f02e500000000000000000000000000000000000000000000000000000000000ff28d",
+    "value": "0",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 32,
+   "t": "2026-11-03T19:47:22.127Z",
+   "saga": "proof-transient",
+   "event": "receipt",
+   "step": "approve-usdc",
+   "hash": "0x6d72f4ee9c967eda0542858bf9ad07d6f63f436db3a6501e7a1c573fdf341339",
+   "block": "22037842",
+   "gasUsed": "55437",
+   "effectiveGasPrice": "9750000000",
+   "status": "success"
+  },
+  {
+   "seq": 33,
+   "t": "2026-11-03T19:47:22.132Z",
+   "saga": "proof-transient",
+   "event": "step.verified",
+   "step": "approve-usdc",
+   "checks": [
+    {
+     "label": "Approval event USDC → 0x047c…02E5",
+     "ok": true,
+     "detail": "value 1045133"
+    },
+    {
+     "label": "allowance at block 22037842",
+     "ok": true,
+     "detail": "1045133 (expected 1045133)"
+    }
+   ],
+   "facts": {}
+  },
+  {
+   "seq": 34,
+   "t": "2026-11-03T19:47:22.132Z",
+   "saga": "proof-transient",
+   "event": "step.start",
+   "step": "deposit",
+   "attempt": 1,
+   "title": "Deposit 1.045133 USDC into RockawayX USDC (Morpho)"
+  },
+  {
+   "seq": 35,
+   "t": "2026-11-03T19:47:22.144Z",
+   "saga": "proof-transient",
+   "event": "step.simulated",
+   "step": "deposit",
+   "gasEstimate": "347687",
+   "gasLimit": "451993",
+   "note": "assets 1.045133 USDC"
+  },
+  {
+   "seq": 36,
+   "t": "2026-11-03T19:47:22.153Z",
+   "saga": "proof-transient",
+   "event": "tx.sent",
+   "step": "deposit",
+   "hash": "0x5beed6c4df3b6a48366804ae26b01d56d9036321ec0502a7c49a47209139ee7b",
+   "nonce": 28,
+   "maxFeePerGas": "18500000000",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "451993",
+   "replaces": null,
+   "built": {
+    "to": "0x047cD0a91E9B92ED979189a6C8A120bf280f02E5",
+    "data": "0x6e553f6500000000000000000000000000000000000000000000000000000000000ff28d000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+    "value": "0",
+    "note": "assets 1.045133 USDC",
+    "meta": {
+     "assets": "1045133"
+    }
+   }
+  },
+  {
+   "seq": 37,
+   "t": "2026-11-03T19:47:22.157Z",
+   "saga": "proof-transient",
+   "event": "receipt",
+   "step": "deposit",
+   "hash": "0x5beed6c4df3b6a48366804ae26b01d56d9036321ec0502a7c49a47209139ee7b",
+   "block": "22037843",
+   "gasUsed": "298287",
+   "effectiveGasPrice": "8656371269",
+   "status": "success"
+  },
+  {
+   "seq": 38,
+   "t": "2026-11-03T19:47:22.157Z",
+   "saga": "proof-transient",
+   "event": "inject",
+   "step": "deposit",
+   "kind": "verify",
+   "detail": "the RPC failed with 503 while reading balances to verify the receipt"
+  },
+  {
+   "seq": 39,
+   "t": "2026-11-03T19:47:22.158Z",
+   "saga": "proof-transient",
+   "event": "step.failed",
+   "step": "deposit",
+   "kind": "rpc",
+   "transient": true,
+   "message": "503 Service Unavailable while verifying (injected)",
+   "attempt": 1
+  },
+  {
+   "seq": 40,
+   "t": "2026-11-03T19:47:22.159Z",
+   "saga": "proof-transient",
+   "event": "step.retry",
+   "step": "deposit",
+   "delayMs": 1582,
+   "nextAttempt": 2
+  },
+  {
+   "seq": 41,
+   "t": "2026-11-03T19:47:23.747Z",
+   "saga": "proof-transient",
+   "event": "step.start",
+   "step": "deposit",
+   "attempt": 2,
+   "title": "Deposit 1.045133 USDC into RockawayX USDC (Morpho)"
+  },
+  {
+   "seq": 42,
+   "t": "2026-11-03T19:47:23.753Z",
+   "saga": "proof-transient",
+   "event": "step.reconciled",
+   "step": "deposit",
+   "hash": "0x5beed6c4df3b6a48366804ae26b01d56d9036321ec0502a7c49a47209139ee7b",
+   "detail": "this step's tx is already mined successfully; verifying that receipt again instead of sending a new tx"
+  },
+  {
+   "seq": 43,
+   "t": "2026-11-03T19:47:23.755Z",
+   "saga": "proof-transient",
+   "event": "receipt",
+   "step": "deposit",
+   "hash": "0x5beed6c4df3b6a48366804ae26b01d56d9036321ec0502a7c49a47209139ee7b",
+   "block": "22037843",
+   "gasUsed": "298287",
+   "effectiveGasPrice": "8656371269",
+   "status": "success"
+  },
+  {
+   "seq": 44,
+   "t": "2026-11-03T19:47:23.767Z",
+   "saga": "proof-transient",
+   "event": "step.verified",
+   "step": "deposit",
+   "checks": [
+    {
+     "label": "vault Deposit event",
+     "ok": true,
+     "detail": "assets 1.045133 USDC · shares 1036224848935696268"
+    },
+    {
+     "label": "share balance +shares",
+     "ok": true,
+     "detail": "1.036228 roxUSDC → 2.072453 roxUSDC"
+    },
+    {
+     "label": "shares worth the deposit",
+     "ok": true,
+     "detail": "worth 1.045132 USDC"
+    }
+   ],
+   "facts": {
+    "shares": "1036224848935696268",
+    "sharesWorth": "1045132"
+   }
+  },
+  {
+   "seq": 45,
+   "t": "2026-11-03T19:47:23.786Z",
+   "saga": "proof-transient",
+   "event": "saga.done",
+   "status": "completed",
+   "problem": null,
+   "end": {
+    "balances": {
+     "pros": "9995981578895424476615",
+     "wpros": "6111613113899730",
+     "usdc": "0",
+     "shares": "2072453708900023444"
+    },
+    "delta": {
+     "pros": "-2003562179010733882",
+     "wpros": "0",
+     "usdc": "0",
+     "shares": "1036224848935696268"
+    },
+    "allowances": {
+     "wprosToFaroSwap": "0",
+     "usdcToFaroSwap": "0",
+     "usdcToVault": "0"
+    },
+    "gasWei": "3562179010733882",
+    "marketCostWei": "0",
+    "invariants": [
+     {
+      "label": "vault shares received",
+      "ok": true
+     },
+     {
+      "label": "no USDC left behind",
+      "ok": true
+     },
+     {
+      "label": "no WPROS left behind",
+      "ok": true
+     },
+     {
+      "label": "no open allowances",
+      "ok": true
+     }
+    ]
+   }
+  }
+ ]
+}

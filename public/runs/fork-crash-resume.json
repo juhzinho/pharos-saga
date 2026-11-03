@@ -1,0 +1,517 @@
+{
+ "name": "fork-crash-resume",
+ "id": "proof-crash",
+ "events": [
+  {
+   "seq": 1,
+   "t": "2026-11-03T19:47:25.635Z",
+   "saga": "proof-crash",
+   "event": "saga.start",
+   "network": "fork",
+   "account": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+   "params": {
+    "amount": "2000000000000000000",
+    "vault": {
+     "id": "rock",
+     "name": "RockawayX USDC (Morpho)",
+     "symbol": "roxUSDC",
+     "address": "0x047cD0a91E9B92ED979189a6C8A120bf280f02E5"
+    },
+    "slippageBps": 100,
+    "compensation": "unwind",
+    "fail": null,
+    "maxFeeGwei": 50,
+    "maxAttempts": 4,
+    "signer": "local-key"
+   },
+   "plan": [
+    {
+     "id": "wrap",
+     "title": "Wrap 2 PROS into WPROS"
+    },
+    {
+     "id": "approve-wpros",
+     "title": "Approve FaroSwap (DODOApprove 0xBF10…849c) to spend 2 WPROS"
+    },
+    {
+     "id": "swap",
+     "title": "Swap 2 WPROS → USDC on FaroSwap (0.01% pool 0x912c…f647)"
+    },
+    {
+     "id": "approve-usdc",
+     "title": "Approve RockawayX USDC (Morpho) to spend the USDC received in step 3"
+    },
+    {
+     "id": "deposit",
+     "title": "Deposit the USDC received in step 3 into RockawayX USDC (Morpho)"
+    }
+   ],
+   "start": {
+    "pros": "9995981578895424476615",
+    "wpros": "6111613113899730",
+    "usdc": "0",
+    "shares": "2072453708900023444"
+   }
+  },
+  {
+   "seq": 2,
+   "t": "2026-11-03T19:47:25.639Z",
+   "saga": "proof-crash",
+   "event": "step.start",
+   "step": "wrap",
+   "attempt": 1,
+   "title": "Wrap 2 PROS into WPROS"
+  },
+  {
+   "seq": 3,
+   "t": "2026-11-03T19:47:25.646Z",
+   "saga": "proof-crash",
+   "event": "step.simulated",
+   "step": "wrap",
+   "gasEstimate": "27842",
+   "gasLimit": "36194",
+   "note": null
+  },
+  {
+   "seq": 4,
+   "t": "2026-11-03T19:47:25.690Z",
+   "saga": "proof-crash",
+   "event": "tx.sent",
+   "step": "wrap",
+   "hash": "0x7fc69241f9ac3f858ef18ca272162967eb504f3b4c85ad71bf35bbaa09b4fa95",
+   "nonce": 29,
+   "maxFeePerGas": "16312742538",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "36194",
+   "replaces": null,
+   "built": {
+    "to": "0x52C48d4213107b20bC583832b0d951FB9CA8F0B0",
+    "data": "0xd0e30db0",
+    "value": "2000000000000000000",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 5,
+   "t": "2026-11-03T19:47:25.696Z",
+   "saga": "proof-crash",
+   "event": "receipt",
+   "step": "wrap",
+   "hash": "0x7fc69241f9ac3f858ef18ca272162967eb504f3b4c85ad71bf35bbaa09b4fa95",
+   "block": "22037844",
+   "gasUsed": "27842",
+   "effectiveGasPrice": "7699895810",
+   "status": "success"
+  },
+  {
+   "seq": 6,
+   "t": "2026-11-03T19:47:25.704Z",
+   "saga": "proof-crash",
+   "event": "step.verified",
+   "step": "wrap",
+   "checks": [
+    {
+     "label": "WPROS Deposit event",
+     "ok": true,
+     "detail": "wad 2000000000000000000"
+    },
+    {
+     "label": "WPROS balance +amount",
+     "ok": true,
+     "detail": "0.006111 WPROS → 2.006111 WPROS"
+    }
+   ],
+   "facts": {
+    "wrapped": "2000000000000000000"
+   }
+  },
+  {
+   "seq": 7,
+   "t": "2026-11-03T19:47:25.705Z",
+   "saga": "proof-crash",
+   "event": "step.start",
+   "step": "approve-wpros",
+   "attempt": 1,
+   "title": "Approve FaroSwap (DODOApprove 0xBF10…849c) to spend 2 WPROS"
+  },
+  {
+   "seq": 8,
+   "t": "2026-11-03T19:47:25.711Z",
+   "saga": "proof-crash",
+   "event": "step.simulated",
+   "step": "approve-wpros",
+   "gasEstimate": "46111",
+   "gasLimit": "59944",
+   "note": null
+  },
+  {
+   "seq": 9,
+   "t": "2026-11-03T19:47:25.719Z",
+   "saga": "proof-crash",
+   "event": "tx.sent",
+   "step": "approve-wpros",
+   "hash": "0xa1c8d22276010c11fa140786e921b490dbc07885ad72c4348bab6ec339805ea0",
+   "nonce": 30,
+   "maxFeePerGas": "14399791620",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "59944",
+   "replaces": null,
+   "built": {
+    "to": "0x52C48d4213107b20bC583832b0d951FB9CA8F0B0",
+    "data": "0x095ea7b3000000000000000000000000bf105f4ffbd3825f5433d074008b9a76237d849c0000000000000000000000000000000000000000000000001bc16d674ec80000",
+    "value": "0",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 10,
+   "t": "2026-11-03T19:47:25.724Z",
+   "saga": "proof-crash",
+   "event": "receipt",
+   "step": "approve-wpros",
+   "hash": "0xa1c8d22276010c11fa140786e921b490dbc07885ad72c4348bab6ec339805ea0",
+   "block": "22037845",
+   "gasUsed": "46111",
+   "effectiveGasPrice": "6862455469",
+   "status": "success"
+  },
+  {
+   "seq": 11,
+   "t": "2026-11-03T19:47:25.728Z",
+   "saga": "proof-crash",
+   "event": "step.verified",
+   "step": "approve-wpros",
+   "checks": [
+    {
+     "label": "Approval event WPROS → 0xBF10…849c",
+     "ok": true,
+     "detail": "value 2000000000000000000"
+    },
+    {
+     "label": "allowance at block 22037845",
+     "ok": true,
+     "detail": "2000000000000000000 (expected 2000000000000000000)"
+    }
+   ],
+   "facts": {}
+  },
+  {
+   "seq": 12,
+   "t": "2026-11-03T19:47:25.728Z",
+   "saga": "proof-crash",
+   "event": "step.start",
+   "step": "swap",
+   "attempt": 1,
+   "title": "Swap 2 WPROS → USDC on FaroSwap (0.01% pool 0x912c…f647)"
+  },
+  {
+   "seq": 13,
+   "t": "2026-11-03T19:47:25.742Z",
+   "saga": "proof-crash",
+   "event": "step.simulated",
+   "step": "swap",
+   "gasEstimate": "239511",
+   "gasLimit": "311364",
+   "note": "quote 1.04513 USDC · min 1.034678 USDC"
+  },
+  {
+   "seq": 14,
+   "t": "2026-11-03T19:47:25.751Z",
+   "saga": "proof-crash",
+   "event": "tx.sent",
+   "step": "swap",
+   "hash": "0xc2d965b6e4e8d224fe99dca63627c7eecb3c764a3d23f300b34fff48062df3f5",
+   "nonce": 31,
+   "maxFeePerGas": "12724910938",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "311364",
+   "replaces": null,
+   "built": {
+    "to": "0xA5cA5Fbe34e444F366B373170541ec6902b0F75c",
+    "data": "0xff84aafa00000000000000000000000052c48d4213107b20bc583832b0d951fb9ca8f0b0000000000000000000000000c879c018db60520f4355c26ed1a6d572cdac18150000000000000000000000000000000000000000000000001bc16d674ec8000000000000000000000000000000000000000000000000000000000000000ff28a00000000000000000000000000000000000000000000000000000000000fc9b6000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002600000000000000000000000000000000000000000000000000000000000000380000000000000000000000000000000000000000000000000000000006aea3efd00000000000000000000000000000000000000000000000000000000000000010000000000000000000000004fd44181839d24e7c8f4d1b9288379109ec25fae0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000912c9ade24d44d8922f0866d8dcb079f1363f64700000000000000000000000000000000000000000000000000000000000000020000000000000000000000004fd44181839d24e7c8f4d1b9288379109ec25fae000000000000000000000000a5ca5fbe34e444f366b373170541ec6902b0f75c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006000000000000000000000000052c48d4213107b20bc583832b0d951fb9ca8f0b0000000000000000000000000c879c018db60520f4355c26ed1a6d572cdac18150000000000000000000000000000000000000000000000000000000000000064000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "value": "0",
+    "note": "quote 1.04513 USDC · min 1.034678 USDC",
+    "meta": {
+     "quoted": "1045130",
+     "min": "1034678"
+    }
+   }
+  },
+  {
+   "seq": 15,
+   "t": "2026-11-03T19:47:25.755Z",
+   "saga": "proof-crash",
+   "event": "inject",
+   "step": "swap",
+   "kind": "crash",
+   "detail": "process stopped right after the broadcast, before the receipt"
+  },
+  {
+   "seq": 16,
+   "t": "2026-11-03T19:47:27.601Z",
+   "saga": "proof-crash",
+   "event": "saga.resume",
+   "from": "running",
+   "step": "swap"
+  },
+  {
+   "seq": 17,
+   "t": "2026-11-03T19:47:27.603Z",
+   "saga": "proof-crash",
+   "event": "step.start",
+   "step": "swap",
+   "attempt": 2,
+   "title": "Swap 2 WPROS → USDC on FaroSwap (0.01% pool 0x912c…f647)"
+  },
+  {
+   "seq": 18,
+   "t": "2026-11-03T19:47:27.608Z",
+   "saga": "proof-crash",
+   "event": "step.reconciled",
+   "step": "swap",
+   "hash": "0xc2d965b6e4e8d224fe99dca63627c7eecb3c764a3d23f300b34fff48062df3f5",
+   "detail": "a transaction from an earlier attempt was already mined; using its receipt instead of sending again"
+  },
+  {
+   "seq": 19,
+   "t": "2026-11-03T19:47:27.609Z",
+   "saga": "proof-crash",
+   "event": "receipt",
+   "step": "swap",
+   "hash": "0xc2d965b6e4e8d224fe99dca63627c7eecb3c764a3d23f300b34fff48062df3f5",
+   "block": "22037846",
+   "gasUsed": "194911",
+   "effectiveGasPrice": "6129716117",
+   "status": "success"
+  },
+  {
+   "seq": 20,
+   "t": "2026-11-03T19:47:27.654Z",
+   "saga": "proof-crash",
+   "event": "step.verified",
+   "step": "swap",
+   "checks": [
+    {
+     "label": "WPROS left the wallet",
+     "ok": true,
+     "detail": "2 WPROS"
+    },
+    {
+     "label": "USDC Transfer to the wallet",
+     "ok": true,
+     "detail": "1.04513 USDC"
+    },
+    {
+     "label": "received ≥ min (1.034678 USDC)",
+     "ok": true,
+     "detail": "received 1.04513 USDC (quote 1.04513 USDC)"
+    }
+   ],
+   "facts": {
+    "usdcOut": "1045130",
+    "swapQuote": "1045130"
+   }
+  },
+  {
+   "seq": 21,
+   "t": "2026-11-03T19:47:27.655Z",
+   "saga": "proof-crash",
+   "event": "step.start",
+   "step": "approve-usdc",
+   "attempt": 1,
+   "title": "Approve RockawayX USDC (Morpho) to spend 1.04513 USDC"
+  },
+  {
+   "seq": 22,
+   "t": "2026-11-03T19:47:27.666Z",
+   "saga": "proof-crash",
+   "event": "step.simulated",
+   "step": "approve-usdc",
+   "gasEstimate": "55819",
+   "gasLimit": "72564",
+   "note": null
+  },
+  {
+   "seq": 23,
+   "t": "2026-11-03T19:47:27.688Z",
+   "saga": "proof-crash",
+   "event": "tx.sent",
+   "step": "approve-usdc",
+   "hash": "0xe1519cc4c3146904287b42e19361144c60950b7832f819571c01ec817378c682",
+   "nonce": 32,
+   "maxFeePerGas": "11259432234",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "72564",
+   "replaces": null,
+   "built": {
+    "to": "0xC879C018dB60520F4355C26eD1a6D572cdAC1815",
+    "data": "0x095ea7b3000000000000000000000000047cd0a91e9b92ed979189a6c8a120bf280f02e500000000000000000000000000000000000000000000000000000000000ff28a",
+    "value": "0",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 24,
+   "t": "2026-11-03T19:47:27.692Z",
+   "saga": "proof-crash",
+   "event": "receipt",
+   "step": "approve-usdc",
+   "hash": "0xe1519cc4c3146904287b42e19361144c60950b7832f819571c01ec817378c682",
+   "block": "22037847",
+   "gasUsed": "55437",
+   "effectiveGasPrice": "5488751562",
+   "status": "success"
+  },
+  {
+   "seq": 25,
+   "t": "2026-11-03T19:47:27.697Z",
+   "saga": "proof-crash",
+   "event": "step.verified",
+   "step": "approve-usdc",
+   "checks": [
+    {
+     "label": "Approval event USDC → 0x047c…02E5",
+     "ok": true,
+     "detail": "value 1045130"
+    },
+    {
+     "label": "allowance at block 22037847",
+     "ok": true,
+     "detail": "1045130 (expected 1045130)"
+    }
+   ],
+   "facts": {}
+  },
+  {
+   "seq": 26,
+   "t": "2026-11-03T19:47:27.698Z",
+   "saga": "proof-crash",
+   "event": "step.start",
+   "step": "deposit",
+   "attempt": 1,
+   "title": "Deposit 1.04513 USDC into RockawayX USDC (Morpho)"
+  },
+  {
+   "seq": 27,
+   "t": "2026-11-03T19:47:27.709Z",
+   "saga": "proof-crash",
+   "event": "step.simulated",
+   "step": "deposit",
+   "gasEstimate": "347687",
+   "gasLimit": "451993",
+   "note": "assets 1.04513 USDC"
+  },
+  {
+   "seq": 28,
+   "t": "2026-11-03T19:47:27.716Z",
+   "saga": "proof-crash",
+   "event": "tx.sent",
+   "step": "deposit",
+   "hash": "0x5bd85a95aabb4f78dbb3c584bc4df6120a38195c46cd9ed64c44a31f1001f35c",
+   "nonce": 33,
+   "maxFeePerGas": "9977503124",
+   "maxPriorityFeePerGas": "1000000000",
+   "gas": "451993",
+   "replaces": null,
+   "built": {
+    "to": "0x047cD0a91E9B92ED979189a6C8A120bf280f02E5",
+    "data": "0x6e553f6500000000000000000000000000000000000000000000000000000000000ff28a000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+    "value": "0",
+    "note": "assets 1.04513 USDC",
+    "meta": {
+     "assets": "1045130"
+    }
+   }
+  },
+  {
+   "seq": 29,
+   "t": "2026-11-03T19:47:27.720Z",
+   "saga": "proof-crash",
+   "event": "receipt",
+   "step": "deposit",
+   "hash": "0x5bd85a95aabb4f78dbb3c584bc4df6120a38195c46cd9ed64c44a31f1001f35c",
+   "block": "22037848",
+   "gasUsed": "298287",
+   "effectiveGasPrice": "4927719828",
+   "status": "success"
+  },
+  {
+   "seq": 30,
+   "t": "2026-11-03T19:47:27.727Z",
+   "saga": "proof-crash",
+   "event": "step.verified",
+   "step": "deposit",
+   "checks": [
+    {
+     "label": "vault Deposit event",
+     "ok": true,
+     "detail": "assets 1.04513 USDC · shares 1036221866726308287"
+    },
+    {
+     "label": "share balance +shares",
+     "ok": true,
+     "detail": "2.072453 roxUSDC → 3.108675 roxUSDC"
+    },
+    {
+     "label": "shares worth the deposit",
+     "ok": true,
+     "detail": "worth 1.045129 USDC"
+    }
+   ],
+   "facts": {
+    "shares": "1036221866726308287",
+    "sharesWorth": "1045129"
+   }
+  },
+  {
+   "seq": 31,
+   "t": "2026-11-03T19:47:27.740Z",
+   "saga": "proof-crash",
+   "event": "saga.done",
+   "status": "completed",
+   "problem": null,
+   "end": {
+    "balances": {
+     "pros": "9993978079176458445719",
+     "wpros": "6111613113899730",
+     "usdc": "0",
+     "shares": "3108675575626331731"
+    },
+    "delta": {
+     "pros": "-2003499718966030896",
+     "wpros": "0",
+     "usdc": "0",
+     "shares": "1036221866726308287"
+    },
+    "allowances": {
+     "wprosToFaroSwap": "0",
+     "usdcToFaroSwap": "0",
+     "usdcToVault": "0"
+    },
+    "gasWei": "3499718966030896",
+    "marketCostWei": "0",
+    "invariants": [
+     {
+      "label": "vault shares received",
+      "ok": true
+     },
+     {
+      "label": "no USDC left behind",
+      "ok": true
+     },
+     {
+      "label": "no WPROS left behind",
+      "ok": true
+     },
+     {
+      "label": "no open allowances",
+      "ok": true
+     }
+    ]
+   }
+  }
+ ]
+}

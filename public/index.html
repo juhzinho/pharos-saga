@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pharos Saga Executor</title>
+  <meta name="description" content="A receipt-verified saga on Pharos Pacific: wrap → approve → FaroSwap swap → approve → Morpho deposit, with a retry policy, compensation and a replayable state log." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #ffffff; --card: #f7f8fa; --ink: #111111; --muted: #6b7280; --line: #ececee; --line-2: #d9dbe0;
+      --brand: #0033ff; --brand-soft: #eef1ff;
+      --ok: #0a7d4f; --ok-soft: #e7f6ef; --warn: #c4312a; --warn-soft: #fdecea; --gold: #9a5b00; --gold-soft: #fff4e5;
+      --undo: #6b3fd6; --undo-soft: #f1ecff;
+      --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace; --sans: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body { margin: 0; font: 15px/1.55 var(--sans); color: var(--ink); background: var(--bg); }
+    a { color: var(--brand); }
+    code, .mono { font-family: var(--mono); font-size: 12.5px; }
+    .top { position: sticky; top: 0; z-index: 10; background: #fff; display: flex; align-items: center; gap: 16px; padding: 14px 40px; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; gap: 10px; align-items: center; color: inherit; text-decoration: none; }
+    .brand b { font-size: 14px; letter-spacing: .12em; font-weight: 800; }
+    .brand em { font-style: normal; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .1em; }
+    .spacer { flex: 1; }
+    .lang button { border: 1px solid var(--line-2); background: #fff; padding: 6px 11px; font: 600 12px var(--sans); cursor: pointer; }
+    .lang button:first-child { border-radius: 999px 0 0 999px; } .lang button:last-child { border-radius: 0 999px 999px 0; border-left: 0; }
+    .lang button.on { background: #111; color: #fff; border-color: #111; }
+    main { max-width: 1180px; margin: 0 auto; padding: 36px 40px 24px; display: grid; gap: 18px; }
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .pill { border: 1px solid var(--line-2); border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--ink); text-decoration: none; background: #fff; }
+    .pill.dark { background: #111; color: #fff; border-color: #111; }
+    h1 { font-size: clamp(36px, 6vw, 64px); line-height: .95; letter-spacing: -.04em; text-transform: uppercase; margin: 0 0 14px; }
+    .lead { color: var(--muted); margin: 0; max-width: 70ch; font-size: 15.5px; }
+    .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 18px; font: 600 13px var(--mono); }
+    .flow span { background: var(--brand-soft); color: var(--brand); border-radius: 6px; padding: 3px 8px; }
+    .flow i { color: var(--muted); font-style: normal; }
+    .card { background: var(--card); border-radius: 10px; padding: 22px; min-width: 0; }
+    .card h2 { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--brand); margin: 0 0 14px; }
+    .why { color: var(--muted); font-size: 13.5px; margin: 0 0 12px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+    .row > label { display: grid; gap: 4px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    input, select { padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 999px; font: inherit; background: #fff; color: var(--ink); min-width: 120px; }
+    .btn { padding: 10px 18px; border: 0; border-radius: 999px; background: var(--brand); color: #fff; font: 600 14px var(--sans); cursor: pointer; }
+    .btn:disabled { opacity: .5; cursor: progress; }
+    .btn.ghost { background: #fff; color: var(--ink); border: 1px solid var(--line-2); }
+    .status { font-size: 13px; color: var(--muted); margin-top: 10px; min-height: 18px; }
+    .status.err { color: var(--warn); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    td, th { padding: 9px 8px 9px 0; border-top: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; border-top: 0; }
+    .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .tag { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .05em; border-radius: 6px; padding: 2px 7px; text-transform: uppercase; background: #fff; color: var(--muted); white-space: nowrap; }
+    .tag.ok { background: var(--ok-soft); color: var(--ok); } .tag.bad { background: var(--warn-soft); color: var(--warn); }
+    .tag.wait { background: var(--gold-soft); color: var(--gold); } .tag.undo { background: var(--undo-soft); color: var(--undo); }
+    .tag.blue { background: var(--brand-soft); color: var(--brand); }
+    .runs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .runs button { border: 1px solid var(--line-2); background: #fff; border-radius: 999px; padding: 7px 13px; font: 600 12.5px var(--sans); cursor: pointer; }
+    .runs button.on { background: #111; color: #fff; border-color: #111; }
+    .now { font: 600 13px var(--mono); background: #111; color: #fff; border-radius: 8px; padding: 10px 12px; margin: 10px 0 14px; overflow-wrap: anywhere; }
+    .scrub { display: flex; gap: 10px; align-items: center; }
+    .scrub input[type=range] { flex: 1; min-width: 0; padding: 0; border: 0; accent-color: var(--brand); }
+    .scrub .num { font: 600 12px var(--mono); color: var(--muted); min-width: 70px; text-align: right; }
+    .lanes { display: grid; gap: 10px; margin-top: 6px; }
+    .lane-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+    .lane { display: flex; gap: 6px; align-items: stretch; overflow-x: auto; padding-bottom: 4px; }
+    .node { flex: 1 1 0; min-width: 132px; background: #fff; border: 2px solid var(--line); border-radius: 10px; padding: 10px; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+    .node .k { font: 600 11px var(--mono); color: var(--muted); }
+    .node .t { font-weight: 700; font-size: 13.5px; margin: 2px 0 6px; overflow-wrap: anywhere; }
+    .node.verified { border-color: var(--ok); } .node.failed { border-color: var(--warn); }
+    .node.running, .node.submitted, .node.waiting-gas, .node.confirmed { border-color: var(--gold); }
+    .node.skipped { border-style: dashed; } .node.compensated { border-color: var(--undo); }
+    .node.current { box-shadow: 0 0 0 3px rgba(0, 51, 255, .18); }
+    .node.sel { outline: 2px solid var(--brand); outline-offset: 2px; }
+    .arrow { align-self: center; color: var(--muted); font-weight: 700; }
+    .detail { background: #fff; border-radius: 10px; padding: 14px 16px; margin-top: 14px; }
+    .detail h3 { margin: 0 0 6px; font-size: 15px; }
+    .kv { display: grid; grid-template-columns: 140px 1fr; gap: 4px 12px; font-size: 13.5px; margin-top: 8px; }
+    .kv div:nth-child(odd) { color: var(--muted); }
+    .check { display: flex; gap: 8px; font-size: 13.5px; padding: 6px 0; border-top: 1px solid var(--line); }
+    .check:first-child { border-top: 0; }
+    .mark { font-weight: 800; min-width: 1em; } .mark.ok { color: var(--ok); } .mark.bad { color: var(--warn); }
+    .hash { font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+    .log { max-height: 420px; overflow: auto; background: #fff; border-radius: 10px; margin-top: 14px; }
+    .log table td { font-size: 12.5px; padding: 6px 8px; border-top: 1px solid var(--line); }
+    .log tr { cursor: pointer; } .log tr.future { opacity: .35; } .log tr.at td { background: var(--brand-soft); }
+    .log .ev { font: 600 11.5px var(--mono); white-space: nowrap; }
+    .log .msg { overflow-wrap: anywhere; }
+    .summary { background: #fff; border-radius: 10px; padding: 14px 16px; margin-top: 14px; }
+    .summary .big { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    footer { color: var(--muted); font-size: 13px; max-width: 1180px; margin: 0 auto; padding: 8px 40px 48px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 900px) {
+      .top { padding: 12px 16px; } main { padding: 24px 16px 16px; } footer { padding: 8px 16px 32px; }
+      .grid2 { grid-template-columns: 1fr; } .brand em { display: none; }
+      .kv { grid-template-columns: 1fr; } .kv div:nth-child(odd) { margin-top: 6px; }
+      .log .t { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#">
+      <svg width="22" height="22" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="8" fill="#0033ff"/><path d="M10 24V11.2h8.4c2.7 0 4.4 1.6 4.4 4 0 1.7-.9 3-2.4 3.6L23.4 24h-3.2l-2.7-5H13.2V24H10zm3.2-7.8h5c1.2 0 1.9-.6 1.9-1.5s-.7-1.5-1.9-1.5h-5v3z" fill="#fff"/></svg>
+      <span><b>PHAROS</b> <em>SAGA EXECUTOR</em></span>
+    </a>
+    <span class="spacer"></span>
+    <div class="lang"><button data-lang="en">EN</button><button data-lang="pt">PT</button></div>
+  </header>
+
+  <main>
+    <section>
+      <div class="pills">
+        <span class="pill dark">SkillEngine · Hard</span>
+        <span class="pill">Pharos Pacific Mainnet · 1672</span>
+        <a class="pill" href="https://github.com/juhzinho/pharos-saga" target="_blank" rel="noopener" data-i="repo"></a>
+        <a class="pill" href="https://github.com/juhzinho/pharos-saga/tree/main/skill/pharos-saga" target="_blank" rel="noopener">SKILL.md</a>
+      </div>
+      <h1>Saga Executor</h1>
+      <p class="lead" data-i="lead"></p>
+      <div class="flow"><span>PROS</span><i>→ wrap →</i><span>WPROS</span><i>→ approve →</i><span>FaroSwap</span><i>→ swap →</i><span>USDC</span><i>→ approve →</i><span>Morpho vault</span><i>→ deposit →</i><span>shares</span></div>
+    </section>
+
+    <section class="card">
+      <h2 data-i="liveTitle"></h2>
+      <p class="why" data-i="liveWhy"></p>
+      <form class="row" id="planForm">
+        <label><span data-i="amount"></span><input id="amount" value="2" inputmode="decimal" autocomplete="off" /></label>
+        <label><span data-i="vault"></span><select id="vault"><option value="rock">RockawayX USDC (Morpho)</option><option value="sharp">SharpByte USDC (Morpho)</option></select></label>
+        <button class="btn" id="planBtn" type="submit" data-i="quote"></button>
+      </form>
+      <div class="status" id="planStatus"></div>
+      <div id="planOut" hidden></div>
+    </section>
+
+    <section class="card">
+      <h2 data-i="runsTitle"></h2>
+      <p class="why" data-i="runsWhy"></p>
+      <div class="runs" id="runs"></div>
+      <div id="runHead"></div>
+      <div class="scrub">
+        <button class="btn ghost" id="play" type="button" data-i="play"></button>
+        <input type="range" id="seq" min="1" max="1" value="1" aria-label="state log position" />
+        <span class="num" id="seqNum"></span>
+      </div>
+      <div class="now" id="now"></div>
+      <div class="lanes" id="lanes"></div>
+      <div class="detail" id="detail"></div>
+      <div class="summary" id="summary" hidden></div>
+      <div class="log"><table><tbody id="log"></tbody></table></div>
+    </section>
+
+    <section class="grid2">
+      <div class="card">
+        <h2 data-i="retryTitle"></h2>
+        <table><thead><tr><th data-i="failure"></th><th data-i="action"></th></tr></thead><tbody id="retryTable"></tbody></table>
+      </div>
+      <div class="card">
+        <h2 data-i="compTitle"></h2>
+        <table><thead><tr><th data-i="failedAt"></th><th data-i="undo"></th></tr></thead><tbody id="compTable"></tbody></table>
+        <p class="why" style="margin-top:12px" data-i="compNote"></p>
+      </div>
+    </section>
+  </main>
+  <footer id="footer"></footer>
+
+  <script type="module">
+    import { replay } from "./lib/log.js";
+
+    const EXPLORER = "https://www.pharosscan.xyz";
+    const T = {
+      en: {
+        repo: "Source on GitHub",
+        lead: "A Skill that runs five dependent transactions on Pharos Pacific Mainnet with real contracts — the official WPROS and USDC, the FaroSwap 0.01% pool and a Morpho USDC vault. Every step is simulated, sent and verified from its receipt before the next starts. Transient failures follow a fixed retry policy; a permanent failure undoes the completed steps in reverse order, so funds are never stranded halfway.",
+        liveTitle: "Live on Pacific Mainnet right now", liveWhy: "Read-only. The swap is quoted by simulating the real FaroSwap mixSwap and the shares by the vault's previewDeposit, at the latest block.",
+        amount: "Amount (PROS)", vault: "Vault", quote: "Quote the saga", quoting: "Reading Pacific Mainnet…",
+        planRows: (p, f) => [
+          ["1 wrap", `${f.pros(p.amountWei)} → ${f.wpros(p.amountWei)}`],
+          ["2 approve", `DODOApprove ${short(p.contracts.dodoApprove)} for ${f.wpros(p.amountWei)}`],
+          ["3 swap", `FaroSwap 0.01% pool → ${f.usdc(p.usdc)} (minimum ${f.usdc(p.minUsdc)} at 1% slippage)`],
+          ["4 approve", `${p.vault.name} for the USDC received`],
+          ["5 deposit", `→ ${f.shares(p.shares, p.vault.symbol)} (previewDeposit)`],
+        ],
+        planMeta: (p, f) => `Block ${Number(p.block).toLocaleString("en-US")} · 1 PROS = ${f.usdc(p.priceUsdcPerPros)} · base fee ${(Number(p.baseFeeWei) / 1e9).toFixed(0)} gwei · gas ≈ ${f.pros(p.gasWei)} for ~${p.gasUnits.toLocaleString("en-US")} units`,
+        runsTitle: "Recorded runs — replay the state log", runsWhy: "Each run is the saga's own state log. Drag the slider or press play: the page folds the events with the same reducer the CLI uses (lib/log.js) and shows exactly which step the saga was in at that moment. Click a step for its transactions, receipt and checks.",
+        play: "Play", pause: "Pause",
+        names: { "fork-success": "Success", "fork-forced-failure": "Forced failure → rollback", "fork-swap-failure": "Swap failure → re-quote → rollback", "fork-transient": "Transient faults → retries", "fork-crash-resume": "Crash → resume", "pacific-success": "Pacific: success", "pacific-forced-failure": "Pacific: forced failure → rollback" },
+        forkBadge: "local fork of Pacific Mainnet", pacificBadge: "Pacific Mainnet",
+        forward: "Forward steps", compensation: "Compensation (reverse order)",
+        status: { pending: "pending", running: "running", "waiting-gas": "gas wait", submitted: "submitted", confirmed: "confirmed", verified: "verified", skipped: "skipped", failed: "failed", compensated: "undone" },
+        pickStep: "Click a step to see its transactions, receipt and checks.",
+        attempts: "Attempts", txs: "Transactions", receipt: "Receipt", checks: "Checks", facts: "Facts", error: "Last error", skip: "Skipped because",
+        dropped: "dropped", replaces: "replaces", settled: "settled",
+        done: { completed: "Completed", compensated: "Compensated — rolled back cleanly", stuck: "Stuck — needs attention" },
+        change: "Change", gas: "Gas paid", market: "Swap round-trip cost",
+        retryTitle: "Retry policy (transient)", failure: "Failure", action: "What the saga does",
+        retry: [
+          ["RPC error, timeout, 429 / 5xx", "back off 1.5 s → 3 s → 6 s, max 4 attempts per step"],
+          ["Dropped: no receipt in 45 s, nonce still free", "re-broadcast with the same nonce and +20% fees — only one can be mined"],
+          ["nonce too low / already known", "look up every hash sent for that nonce before anything else"],
+          ["Gas spike: base fee above 50 gwei", "wait without using an attempt; pause after 2 min (resumable)"],
+          ["Swap returned less than its minimum", "re-quote once, then permanent"],
+          ["Crash after a broadcast", "resume reads the log, finds the receipt, never sends twice"],
+        ],
+        compTitle: "Compensation (permanent)", failedAt: "Failed at", undo: "Undo, last done first",
+        comp: [
+          ["deposit", "revoke vault allowance → approve FaroSwap → swap USDC back → revoke WPROS allowance → unwrap"],
+          ["approve-usdc", "swap USDC back → revoke → unwrap"],
+          ["swap", "revoke WPROS allowance → unwrap"],
+          ["approve-wpros", "unwrap"],
+        ],
+        compNote: "Only what this saga created is undone (balance now − balance at the start). With --compensation park the saga stops in USDC instead. Every undo is receipt-verified, and the run ends with ✓/✗ invariants: no tokens left behind, no open allowances.",
+        footer: `Pharos Pacific Mainnet (1672) · <a href="https://docs.pharos.xyz/getting-started/token-registry">official WPROS / USDC</a> · FaroSwap DODORouteProxy · Morpho vaults · receipts cross-checked with the <a href="https://mcp.pharos.xyz/mcp">Chain MCP</a> on Pacific · <a href="https://pharos-agent-arena.vercel.app/">Agent Arena</a>`,
+        loadErr: "Could not load the run.",
+        nowLabel: "NOW", sagaStatus: { new: "NEW", running: "RUNNING", compensating: "COMPENSATING", compensated: "COMPENSATED", completed: "COMPLETED", paused: "PAUSED", stuck: "STUCK" },
+        stepWord: "step", undoWord: "undo", attemptWord: "attempt",
+        inv: {},
+      },
+      pt: {
+        repo: "Código no GitHub",
+        lead: "Um Skill que executa cinco transações dependentes na Pharos Pacific Mainnet com contratos reais — WPROS e USDC oficiais, a pool 0,01% da FaroSwap e um vault USDC da Morpho. Cada passo é simulado, enviado e verificado pelo recibo antes do próximo começar. Falhas transitórias seguem uma política de retry fixa; uma falha permanente desfaz os passos concluídos em ordem inversa, então os fundos nunca ficam presos no meio.",
+        liveTitle: "Ao vivo na Pacific Mainnet agora", liveWhy: "Só leitura. O swap é cotado simulando o mixSwap real da FaroSwap, e as cotas pelo previewDeposit do vault, no bloco mais recente.",
+        amount: "Quantidade (PROS)", vault: "Vault", quote: "Cotar a saga", quoting: "Lendo a Pacific Mainnet…",
+        planRows: (p, f) => [
+          ["1 wrap", `${f.pros(p.amountWei)} → ${f.wpros(p.amountWei)}`],
+          ["2 approve", `DODOApprove ${short(p.contracts.dodoApprove)} para ${f.wpros(p.amountWei)}`],
+          ["3 swap", `pool 0,01% da FaroSwap → ${f.usdc(p.usdc)} (mínimo ${f.usdc(p.minUsdc)} com 1% de slippage)`],
+          ["4 approve", `${p.vault.name} para o USDC recebido`],
+          ["5 deposit", `→ ${f.shares(p.shares, p.vault.symbol)} (previewDeposit)`],
+        ],
+        planMeta: (p, f) => `Bloco ${Number(p.block).toLocaleString("pt-BR")} · 1 PROS = ${f.usdc(p.priceUsdcPerPros)} · taxa base ${(Number(p.baseFeeWei) / 1e9).toFixed(0)} gwei · gás ≈ ${f.pros(p.gasWei)} para ~${p.gasUnits.toLocaleString("pt-BR")} unidades`,
+        runsTitle: "Execuções gravadas — reproduza o log de estado", runsWhy: "Cada execução é o próprio log de estado da saga. Arraste a barra ou clique em play: a página aplica os eventos com o mesmo reducer da linha de comando (lib/log.js) e mostra exatamente em que passo a saga estava naquele momento. Clique num passo para ver transações, recibo e checagens.",
+        play: "Play", pause: "Pausar",
+        names: { "fork-success": "Sucesso", "fork-forced-failure": "Falha forçada → reversão", "fork-swap-failure": "Falha no swap → nova cotação → reversão", "fork-transient": "Falhas transitórias → retries", "fork-crash-resume": "Crash → resume", "pacific-success": "Pacific: sucesso", "pacific-forced-failure": "Pacific: falha forçada → reversão" },
+        forkBadge: "fork local da Pacific Mainnet", pacificBadge: "Pacific Mainnet",
+        forward: "Passos", compensation: "Compensação (ordem inversa)",
+        status: { pending: "pendente", running: "rodando", "waiting-gas": "esperando gás", submitted: "enviado", confirmed: "confirmado", verified: "verificado", skipped: "pulado", failed: "falhou", compensated: "desfeito" },
+        pickStep: "Clique num passo para ver as transações, o recibo e as checagens.",
+        attempts: "Tentativas", txs: "Transações", receipt: "Recibo", checks: "Checagens", facts: "Fatos", error: "Último erro", skip: "Pulado porque",
+        dropped: "perdida", replaces: "substitui", settled: "resolvida",
+        done: { completed: "Concluída", compensated: "Compensada — revertida sem sobras", stuck: "Travada — precisa de atenção" },
+        change: "Variação", gas: "Gás pago", market: "Custo da troca de ida e volta",
+        retryTitle: "Política de retry (transitória)", failure: "Falha", action: "O que a saga faz",
+        retry: [
+          ["Erro de RPC, timeout, 429 / 5xx", "espera 1,5 s → 3 s → 6 s, no máximo 4 tentativas por passo"],
+          ["Perdida: sem recibo em 45 s, nonce ainda livre", "reenvia com o mesmo nonce e +20% de taxa — só uma pode ser minerada"],
+          ["nonce too low / already known", "procura o recibo de todo hash enviado com aquele nonce antes de qualquer coisa"],
+          ["Pico de gás: taxa base acima de 50 gwei", "espera sem gastar tentativa; pausa depois de 2 min (dá para retomar)"],
+          ["Swap retornou menos que o mínimo", "cota de novo uma vez, depois vira permanente"],
+          ["Crash depois de enviar", "o resume lê o log, acha o recibo e nunca envia duas vezes"],
+        ],
+        compTitle: "Compensação (permanente)", failedAt: "Falhou em", undo: "Desfaz, do último para o primeiro",
+        comp: [
+          ["deposit", "revoga o vault → aprova a FaroSwap → troca o USDC de volta → revoga o WPROS → desembrulha"],
+          ["approve-usdc", "troca o USDC de volta → revoga → desembrulha"],
+          ["swap", "revoga o WPROS → desembrulha"],
+          ["approve-wpros", "desembrulha"],
+        ],
+        compNote: "Só o que esta saga criou é desfeito (saldo agora − saldo no início). Com --compensation park a saga para em USDC. Cada desfazer é verificado pelo recibo, e a execução termina com invariantes ✓/✗: nenhum token sobrando, nenhuma aprovação aberta.",
+        footer: `Pharos Pacific Mainnet (1672) · <a href="https://docs.pharos.xyz/getting-started/token-registry">WPROS / USDC oficiais</a> · FaroSwap DODORouteProxy · vaults Morpho · recibos conferidos com o <a href="https://mcp.pharos.xyz/mcp">Chain MCP</a> na Pacific · <a href="https://pharos-agent-arena.vercel.app/">Agent Arena</a>`,
+        loadErr: "Não foi possível carregar a execução.",
+        nowLabel: "AGORA", sagaStatus: { new: "NOVA", running: "RODANDO", compensating: "COMPENSANDO", compensated: "COMPENSADA", completed: "CONCLUÍDA", paused: "PAUSADA", stuck: "TRAVADA" },
+        stepWord: "passo", undoWord: "desfazer", attemptWord: "tentativa",
+        inv: {
+          "vault shares received": "cotas do vault recebidas",
+          "no USDC left behind": "nenhum USDC sobrando",
+          "no WPROS left behind": "nenhum WPROS sobrando",
+          "no open allowances": "nenhuma aprovação aberta",
+          "back to PROS: WPROS as at start": "de volta a PROS: WPROS igual ao início",
+          "back to PROS: USDC as at start": "de volta a PROS: USDC igual ao início",
+          "no vault shares created": "nenhuma cota do vault criada",
+          "parked in USDC, nothing else stranded": "estacionado em USDC, nada mais preso",
+          "needs attention": "precisa de atenção",
+        },
+      },
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    const short = (a) => `${a.slice(0, 6)}…${a.slice(-4)}`;
+    function units(v, dec, max = 6) {
+      const neg = BigInt(v) < 0n;
+      const x = neg ? -BigInt(v) : BigInt(v);
+      const base = 10n ** BigInt(dec);
+      const frac = (x % base).toString().padStart(dec, "0").slice(0, max).replace(/0+$/, "");
+      const int = (x / base).toLocaleString(lang === "pt" ? "pt-BR" : "en-US");
+      return `${neg ? "-" : ""}${int}${frac ? (lang === "pt" ? "," : ".") + frac : ""}`;
+    }
+    const f = {
+      pros: (v) => `${units(v, 18)} PROS`, wpros: (v) => `${units(v, 18)} WPROS`, usdc: (v) => `${units(v, 6)} USDC`, shares: (v, s) => `${units(v, 18)} ${s}`,
+      signed: (v, fn) => (BigInt(v) >= 0n ? "+" : "−") + fn(BigInt(v) < 0n ? -BigInt(v) : BigInt(v)),
+    };
+    const gwei = (v) => `${(Number(BigInt(v)) / 1e9).toFixed(2).replace(/\.00$/, "")} gwei`;
+
+    let lang = new URLSearchParams(location.search).get("lang") === "pt" || (!location.search.includes("lang=") && navigator.language?.startsWith("pt")) ? "pt" : "en";
+    let runIndex = [];
+    let run = null;
+    let k = 1;
+    let selected = null;
+    let timer = null;
+    let lastPlan = null;
+
+    // ---------- event → one line ----------
+    function line(e, s) {
+      const pt = lang === "pt";
+      const p = s.params;
+      switch (e.event) {
+        case "saga.start": return pt ? `saga iniciada: ${f.pros(e.params.amount)} → ${e.params.vault.name}; ao falhar: ${e.params.compensation}${e.params.fail ? ` · falha forçada em ${e.params.fail}` : ""}` : `saga started: ${f.pros(e.params.amount)} → ${e.params.vault.name}; on failure: ${e.params.compensation}${e.params.fail ? ` · forced failure at ${e.params.fail}` : ""}`;
+        case "saga.resume": return pt ? `retomada: estado reconstruído pelo log (estava em ${e.step ?? e.from})` : `resumed: state rebuilt from the log (was in ${e.step ?? e.from})`;
+        case "step.start": return `${pt ? "tentativa" : "attempt"} ${e.attempt}/${p.maxAttempts} · ${e.title ?? s.steps[e.step].title}`;
+        case "step.prepared": return e.detail;
+        case "step.skip": return `${pt ? "pulado" : "skipped"}: ${e.reason}`;
+        case "step.simulated": return e.predictsRevert ? `${pt ? "simulação prevê revert" : "simulation predicts a revert"}: ${e.reason}` : `${pt ? "simulado" : "simulated"} · gas ${Number(e.gasEstimate).toLocaleString()}${e.note ? ` · ${e.note}` : ""}`;
+        case "gas.wait": return pt ? `pico de gás: ${e.baseFeeGwei} gwei > teto ${e.capGwei} gwei — esperando` : `gas spike: ${e.baseFeeGwei} gwei > cap ${e.capGwei} gwei — waiting`;
+        case "tx.sent": return `tx ${short(e.hash)} · nonce ${e.nonce} · max fee ${gwei(e.maxFeePerGas)}${e.replaces ? ` · ${pt ? "substitui" : "replaces"} ${short(e.replaces)}` : ""}${s.steps[e.step].txs.filter((x) => x.hash === e.hash).length > 1 ? (pt ? " · a mesma tx assinada de antes (hash idêntico), agora enviada de fato" : " · the same signed tx as before (identical hash), now actually broadcast") : ""}`;
+        case "inject": return `⚡ ${pt ? "injetado" : "injected"} ${e.kind}: ${e.detail}`;
+        case "tx.dropped": return `${pt ? "perdida" : "dropped"} ${short(e.hash)}: ${e.detail}`;
+        case "step.reconciled": return `↺ ${e.detail}`;
+        case "receipt": return `${pt ? "recibo" : "receipt"} · ${pt ? "bloco" : "block"} ${Number(e.block).toLocaleString()} · ${e.status} · gas ${Number(e.gasUsed).toLocaleString()}`;
+        case "mcp.check": return `Chain MCP: ${e.detail}`;
+        case "step.verified": return `${pt ? "verificado" : "verified"}: ${e.checks.map((c) => (c.ok ? "✓ " : "✗ ") + c.label).join(" · ")}`;
+        case "step.failed": return `${e.transient ? (pt ? "transitória" : "transient") : pt ? "permanente" : "permanent"} (${e.kind}): ${e.message}`;
+        case "step.retry": return pt ? `política de retry: tentativa ${e.nextAttempt} em ${(e.delayMs / 1000).toFixed(1).replace(".", ",")} s` : `retry policy: attempt ${e.nextAttempt} in ${(e.delayMs / 1000).toFixed(1)} s`;
+        case "step.requote": return pt ? "política de retry: swap abaixo do mínimo, nova cotação (uma vez)" : "retry policy: swap below its minimum, re-quote once";
+        case "saga.compensating": return pt ? `compensação: ${e.failedStep} falhou de vez (${e.reason}). Desfazer: ${e.plan.map((x) => x.id).join(" → ")}` : `compensate: ${e.failedStep} failed permanently (${e.reason}). Undo: ${e.plan.map((x) => x.id).join(" → ")}`;
+        case "saga.paused": return `${pt ? "pausada" : "paused"}: ${e.message}`;
+        case "saga.done": return `${T[lang].done[e.status] ?? e.status}`;
+        default: return "";
+      }
+    }
+
+    // ---------- runs ----------
+    async function loadIndex() {
+      runIndex = await (await fetch("./runs/index.json", { cache: "no-store" })).json();
+      renderRunButtons();
+      const want = new URLSearchParams(location.search).get("run");
+      await pick(runIndex.find((r) => r.name === want)?.name ?? runIndex[0]?.name);
+    }
+
+    function renderRunButtons() {
+      $("runs").innerHTML = runIndex.map((r) => `<button type="button" data-run="${esc(r.name)}" class="${run?.name === r.name ? "on" : ""}">${esc(T[lang].names[r.name] ?? r.name)}</button>`).join("");
+      $("runs").querySelectorAll("button").forEach((b) => (b.onclick = () => pick(b.dataset.run)));
+    }
+
+    async function pick(name) {
+      if (!name) return;
+      stop();
+      try {
+        run = await (await fetch(`./runs/${encodeURIComponent(name)}.json`, { cache: "no-store" })).json();
+      } catch {
+        $("now").textContent = T[lang].loadErr;
+        return;
+      }
+      k = run.events.length;
+      selected = null;
+      $("seq").max = String(run.events.length);
+      $("seq").value = String(k);
+      renderRunButtons();
+      render();
+    }
+
+    function render() {
+      if (!run) return;
+      const t = T[lang];
+      const events = run.events.slice(0, k);
+      const s = replay(events);
+      const full = replay(run.events);
+      const pacific = full.network === "pacific";
+      const link = (h) => (pacific ? `<a class="hash" href="${EXPLORER}/tx/${esc(h)}" target="_blank" rel="noopener">${esc(h)}</a>` : `<span class="hash">${esc(h)}</span>`);
+      $("seqNum").textContent = `${k} / ${run.events.length}`;
+      $("runHead").innerHTML = `<div class="row" style="margin-bottom:12px;gap:8px"><span class="tag ${pacific ? "ok" : "blue"}">${esc(pacific ? t.pacificBadge : t.forkBadge)}</span><span class="tag">${esc(full.id)}</span><span class="tag">${esc(short(full.account))}</span>${full.params.fail ? `<span class="tag bad">--fail ${esc(full.params.fail)}</span>` : ""}${full.injected.map((x) => `<span class="tag wait">⚡ ${esc(x.kind)}@${esc(x.step)}</span>`).join("")}</div>`;
+      $("now").textContent = `${t.nowLabel}: ${nowLine(s, t)}`;
+
+      // lanes: forward + compensation (from the full run, so the layout does not jump while scrubbing)
+      const node = (id, i, phase) => {
+        const st = s.steps[id] ?? { status: "pending", attempts: 0, title: full.steps[id].title };
+        const cls = `node ${st.status} ${s.current?.step === id ? "current" : ""} ${selected === id ? "sel" : ""}`;
+        const tagCls = { verified: "ok", failed: "bad", compensated: "undo", skipped: "", pending: "" }[st.status] ?? "wait";
+        return `<button type="button" class="${cls}" data-step="${esc(id)}"><div class="k">${phase === "forward" ? i + 1 : "↶" + (i + 1)} · ${esc(id)}</div><div class="t">${esc(st.title)}</div><span class="tag ${tagCls}">${esc(t.status[st.status] ?? st.status)}</span>${st.attempts > 1 ? ` <span class="tag wait">×${st.attempts}</span>` : ""}</button>`;
+      };
+      const lane = (ids, phase) => ids.map((id, i) => node(id, i, phase)).join(`<span class="arrow">→</span>`);
+      $("lanes").innerHTML = `<div class="lane-label">${esc(t.forward)}</div><div class="lane">${lane(full.order, "forward")}</div>` + (full.compensation.length ? `<div class="lane-label">${esc(t.compensation)}</div><div class="lane">${lane(full.compensation, "compensation")}</div>` : "");
+      $("lanes").querySelectorAll(".node").forEach((b) => (b.onclick = () => { selected = b.dataset.step; render(); }));
+
+      // detail
+      const sel = selected ?? s.current?.step ?? null;
+      const st = sel ? s.steps[sel] : null;
+      if (!st) $("detail").innerHTML = `<span class="why">${esc(t.pickStep)}</span>`;
+      else {
+        const txs = st.txs.map((x) => `<div>${link(x.hash)} · nonce ${x.nonce} · ${gwei(x.maxFeePerGas)}${x.replaces ? ` · <span class="tag wait">${esc(t.replaces)} ${esc(short(x.replaces))}</span>` : ""}${x.dropped ? ` <span class="tag bad">${esc(t.dropped)}</span>` : ""}</div>`).join("") || "—";
+        const r = st.receipt;
+        $("detail").innerHTML = `<h3>${esc(sel)} — ${esc(st.title)}</h3>
+          <div class="kv">
+            <div>Status</div><div><span class="tag">${esc(t.status[st.status] ?? st.status)}</span></div>
+            <div>${esc(t.attempts)}</div><div>${st.attempts}</div>
+            ${st.skipReason ? `<div>${esc(t.skip)}</div><div>${esc(st.skipReason)}</div>` : ""}
+            <div>${esc(t.txs)}</div><div>${txs}</div>
+            ${r ? `<div>${esc(t.receipt)}</div><div>block ${Number(r.block).toLocaleString()} · ${esc(r.status)} · gas ${Number(r.gasUsed).toLocaleString()}</div>` : ""}
+            ${st.error ? `<div>${esc(t.error)}</div><div>${esc(st.error.kind)}: ${esc(st.error.message)}</div>` : ""}
+            ${Object.keys(st.facts).length ? `<div>${esc(t.facts)}</div><div class="mono">${esc(Object.entries(st.facts).map(([a, b]) => `${a} = ${b}`).join(" · "))}</div>` : ""}
+          </div>
+          ${st.checks.length ? `<div style="margin-top:10px">${st.checks.map((c) => `<div class="check"><span class="mark ${c.ok ? "ok" : "bad"}">${c.ok ? "✓" : "✗"}</span><span><b>${esc(c.label)}</b> — ${esc(c.detail)}</span></div>`).join("")}</div>` : ""}`;
+      }
+
+      // summary at the end
+      const done = events.findLast((e) => e.event === "saga.done");
+      if (!done) $("summary").hidden = true;
+      else {
+        const d = done.end.delta;
+        const sym = full.params.vault.symbol;
+        $("summary").hidden = false;
+        $("summary").innerHTML = `<div class="big">${esc(t.done[done.status] ?? done.status)}</div>
+          <div class="kv">
+            <div>${esc(t.change)}</div><div class="num">${f.signed(d.pros, f.pros)} · ${f.signed(d.wpros, f.wpros)} · ${f.signed(d.usdc, f.usdc)} · ${f.signed(d.shares, (v) => f.shares(v, sym))}</div>
+            <div>${esc(t.gas)}</div><div class="num">${f.pros(done.end.gasWei)}</div>
+            ${BigInt(done.end.marketCostWei ?? 0) > 0n ? `<div>${esc(t.market)}</div><div class="num">${f.pros(done.end.marketCostWei)}</div>` : ""}
+          </div>
+          <div style="margin-top:10px">${done.end.invariants.map((i) => `<div class="check"><span class="mark ${i.ok ? "ok" : "bad"}">${i.ok ? "✓" : "✗"}</span><span>${esc(t.inv[i.label] ?? i.label)}</span></div>`).join("")}</div>`;
+      }
+
+      // event log
+      $("log").innerHTML = run.events.map((e, i) => {
+        const at = replay(run.events.slice(0, i + 1));
+        return `<tr data-k="${i + 1}" class="${i + 1 > k ? "future" : ""} ${i + 1 === k ? "at" : ""}"><td class="num mono">${e.seq}</td><td class="num mono t">${esc(e.t.slice(11, 19))}</td><td class="ev">${esc(e.event)}</td><td class="mono">${esc(e.step ?? "")}</td><td class="msg">${esc(line(e, at))}</td></tr>`;
+      }).join("");
+      $("log").querySelectorAll("tr").forEach((tr) => (tr.onclick = () => { k = Number(tr.dataset.k); $("seq").value = String(k); render(); }));
+    }
+
+    // Same facts as whereNow() in lib/log.js, in the page language.
+    function nowLine(s, t) {
+      if (!s.id) return "—";
+      const head = t.sagaStatus[s.status] ?? s.status.toUpperCase();
+      if (!s.current) return head;
+      const st = s.steps[s.current.step];
+      const tx = st.txs.at(-1);
+      return `${head} · ${s.current.phase === "compensation" ? t.undoWord : t.stepWord} ${s.current.step} · ${t.status[st.status] ?? st.status}${tx ? ` · tx ${tx.hash.slice(0, 10)}… nonce ${tx.nonce}` : ""} · ${t.attemptWord} ${st.attempts}`;
+    }
+
+    function stop() {
+      clearInterval(timer);
+      timer = null;
+      $("play").textContent = T[lang].play;
+    }
+    $("play").onclick = () => {
+      if (timer) return stop();
+      if (k >= run.events.length) k = 1;
+      $("play").textContent = T[lang].pause;
+      timer = setInterval(() => {
+        if (k >= run.events.length) return stop();
+        k += 1;
+        $("seq").value = String(k);
+        render();
+      }, 450);
+    };
+    $("seq").oninput = () => { stop(); k = Number($("seq").value); render(); };
+
+    // ---------- live plan ----------
+    async function quote(e) {
+      e?.preventDefault();
+      const t = T[lang];
+      const amount = $("amount").value.trim().replace(",", ".");
+      $("planBtn").disabled = true;
+      $("planStatus").className = "status";
+      $("planStatus").textContent = t.quoting;
+      try {
+        const res = await fetch(`/api/plan?amount=${encodeURIComponent(amount)}&vault=${encodeURIComponent($("vault").value)}`);
+        const body = await res.json();
+        if (!body.ok) throw new Error(body.error);
+        lastPlan = body;
+        renderPlan();
+        $("planStatus").textContent = "";
+      } catch (err) {
+        $("planStatus").className = "status err";
+        $("planStatus").textContent = err.message;
+      } finally {
+        $("planBtn").disabled = false;
+      }
+    }
+    function renderPlan() {
+      if (!lastPlan) return;
+      const t = T[lang];
+      $("planOut").hidden = false;
+      $("planOut").innerHTML = `<table>${t.planRows(lastPlan, f).map(([a, b]) => `<tr><td class="mono" style="width:120px">${esc(a)}</td><td>${esc(b)}</td></tr>`).join("")}</table><p class="why" style="margin-top:10px">${esc(t.planMeta(lastPlan, f))}</p>`;
+    }
+    $("planForm").onsubmit = quote;
+
+    // ---------- text ----------
+    function applyText() {
+      const t = T[lang];
+      document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
+      document.querySelectorAll("[data-i]").forEach((el) => (el.textContent = t[el.dataset.i]));
+      document.querySelectorAll(".lang button").forEach((b) => b.classList.toggle("on", b.dataset.lang === lang));
+      $("retryTable").innerHTML = t.retry.map(([a, b]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td></tr>`).join("");
+      $("compTable").innerHTML = t.comp.map(([a, b]) => `<tr><td class="mono">${esc(a)}</td><td>${esc(b)}</td></tr>`).join("");
+      $("footer").innerHTML = t.footer;
+      $("play").textContent = timer ? t.pause : t.play;
+      renderRunButtons();
+      render();
+      renderPlan();
+    }
+    document.querySelectorAll(".lang button").forEach((b) => (b.onclick = () => { lang = b.dataset.lang; applyText(); }));
+
+    applyText();
+    loadIndex();
+    quote();
+  </script>
+</body>
+</html>
