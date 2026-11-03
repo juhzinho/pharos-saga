@@ -4,3 +4,5 @@ node_modules/
 runs/local/
 .claude/
 public/lib/
+
+.vercel

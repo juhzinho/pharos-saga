@@ -16,7 +16,7 @@ Rules:
 - **Only the saga's own approvals.** A step skipped because the user already had an approval registers no compensation.
 - **Same guarantees as forward steps.** Each compensation is simulated, receipt-checked and verified, with the same retry policy.
 - **Final invariants.** At the end the saga reads balances and the three allowances again and prints ✓/✗ for each promise (e.g. "back to PROS: USDC as at start", "no open allowances").
-- **Cost is reported.** For an unwind, the PROS difference is split into gas and the swap round-trip cost (pool fee + price impact).
+- **Cost is reported.** For an unwind, the PROS difference is split into gas and the swap round-trip cost: the 0.01% pool fee plus the 0.15% FaroSwap route fee (`DODORouteProxy.routeFeeRate()`), both ways, plus price impact.
 - If a compensation itself fails permanently, the saga ends **STUCK** with the step and the reason, instead of improvising.
 
 Policies: `--compensation unwind` (default, back to PROS) or `--compensation park` (stop in USDC, the stable asset, without paying for a second swap).

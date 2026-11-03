@@ -26,7 +26,7 @@ Real contracts only: the official WPROS and USDC from the Pharos token registry,
 - **Crash-safe, exactly once.** The tx hash is written to the log *before* broadcast. Kill the process at any point (`--inject crash@swap`), run `resume`: it finds the receipt of what was already sent and never sends it again.
 - **Fault injection** that uses the real chain: `rpc@step` (503 before broadcast), `drop@step` (signed, never broadcast), `gas@step` (Anvil base fee forced to 200 gwei for 9 s), `crash@step`, `verify@step` (the tx is mined, then the balance read fails — the retry re-verifies the same receipt and never sends twice).
 - **Final invariants.** Every run ends by re-reading balances and the three allowances and printing ✓/✗: *no USDC left behind, no WPROS left behind, no open allowances, back to PROS…*
-- **Honest cost.** A rollback reports gas and the swap round-trip cost (pool fee + price impact) separately.
+- **Honest cost.** A rollback reports gas and the swap round-trip cost separately: the 0.01% pool fee plus the 0.15% FaroSwap route fee (`DODORouteProxy.routeFeeRate()` = 1.5e15, read on chain), both ways, plus price impact.
 - **Idempotent steps.** An approval that already exists is skipped; skipped steps are never "undone" (the user's own approvals are left alone).
 - **Readable reverts.** Custom errors are decoded, e.g. `TransferFromReverted()` from the Morpho vault.
 - **SkillEngine-ready.** `SKILL.md` + references, and `npm run saga -- cast` prints the same five steps as Foundry `cast send` commands with live calldata.

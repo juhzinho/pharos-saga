@@ -195,7 +195,7 @@
         attempts: "Attempts", txs: "Transactions", receipt: "Receipt", checks: "Checks", facts: "Facts", error: "Last error", skip: "Skipped because",
         dropped: "dropped", replaces: "replaces", settled: "settled",
         done: { completed: "Completed", compensated: "Compensated — rolled back cleanly", stuck: "Stuck — needs attention" },
-        change: "Change", gas: "Gas paid", market: "Swap round-trip cost",
+        change: "Change", gas: "Gas paid", market: "Swap round-trip cost (0.01% pool + 0.15% route fee, both ways, + impact)",
         retryTitle: "Retry policy (transient)", failure: "Failure", action: "What the saga does",
         retry: [
           ["RPC error, timeout, 429 / 5xx", "back off 1.5 s → 3 s → 6 s, max 4 attempts per step"],
@@ -242,7 +242,7 @@
         attempts: "Tentativas", txs: "Transações", receipt: "Recibo", checks: "Checagens", facts: "Fatos", error: "Último erro", skip: "Pulado porque",
         dropped: "perdida", replaces: "substitui", settled: "resolvida",
         done: { completed: "Concluída", compensated: "Compensada — revertida sem sobras", stuck: "Travada — precisa de atenção" },
-        change: "Variação", gas: "Gás pago", market: "Custo da troca de ida e volta",
+        change: "Variação", gas: "Gás pago", market: "Custo da troca de ida e volta (pool 0,01% + taxa de rota 0,15%, nos dois sentidos, + impacto)",
         retryTitle: "Política de retry (transitória)", failure: "Falha", action: "O que a saga faz",
         retry: [
           ["Erro de RPC, timeout, 429 / 5xx", "espera 1,5 s → 3 s → 6 s, no máximo 4 tentativas por passo"],
