@@ -170,7 +170,7 @@
   <script type="module">
     import { replay } from "./lib/log.js";
 
-    const EXPLORER = "https://www.pharosscan.xyz";
+    const EXPLORERS = { pacific: "https://www.pharosscan.xyz", atlantic: "https://atlantic.pharosscan.xyz" };
     const T = {
       en: {
         repo: "Source on GitHub",
@@ -187,8 +187,8 @@
         planMeta: (p, f) => `Block ${Number(p.block).toLocaleString("en-US")} · 1 PROS = ${f.usdc(p.priceUsdcPerPros)} · base fee ${(Number(p.baseFeeWei) / 1e9).toFixed(0)} gwei · gas ≈ ${f.pros(p.gasWei)} for ~${p.gasUnits.toLocaleString("en-US")} units`,
         runsTitle: "Recorded runs — replay the state log", runsWhy: "Each run is the saga's own state log. Drag the slider or press play: the page folds the events with the same reducer the CLI uses (lib/log.js) and shows exactly which step the saga was in at that moment. Click a step for its transactions, receipt and checks.",
         play: "Play", pause: "Pause",
-        names: { "fork-success": "Success", "fork-forced-failure": "Forced failure → rollback", "fork-swap-failure": "Swap failure → re-quote → rollback", "fork-transient": "Transient faults → retries", "fork-crash-resume": "Crash → resume", "pacific-success": "Pacific: success", "pacific-forced-failure": "Pacific: forced failure → rollback" },
-        forkBadge: "local fork of Pacific Mainnet", pacificBadge: "Pacific Mainnet",
+        names: { "atlantic-success": "Atlantic: success", "atlantic-rollback": "Atlantic: forced failure → rollback", "fork-success": "Success", "fork-forced-failure": "Forced failure → rollback", "fork-swap-failure": "Swap failure → re-quote → rollback", "fork-transient": "Transient faults → retries", "fork-crash-resume": "Crash → resume", "pacific-success": "Pacific: success", "pacific-forced-failure": "Pacific: forced failure → rollback" },
+        forkBadge: "local fork of Pacific Mainnet", pacificBadge: "Pacific Mainnet", atlanticBadge: "Atlantic Testnet · real transactions",
         forward: "Forward steps", compensation: "Compensation (reverse order)",
         status: { pending: "pending", running: "running", "waiting-gas": "gas wait", submitted: "submitted", confirmed: "confirmed", verified: "verified", skipped: "skipped", failed: "failed", compensated: "undone" },
         pickStep: "Click a step to see its transactions, receipt and checks.",
@@ -234,8 +234,8 @@
         planMeta: (p, f) => `Bloco ${Number(p.block).toLocaleString("pt-BR")} · 1 PROS = ${f.usdc(p.priceUsdcPerPros)} · taxa base ${(Number(p.baseFeeWei) / 1e9).toFixed(0)} gwei · gás ≈ ${f.pros(p.gasWei)} para ~${p.gasUnits.toLocaleString("pt-BR")} unidades`,
         runsTitle: "Execuções gravadas — reproduza o log de estado", runsWhy: "Cada execução é o próprio log de estado da saga. Arraste a barra ou clique em play: a página aplica os eventos com o mesmo reducer da linha de comando (lib/log.js) e mostra exatamente em que passo a saga estava naquele momento. Clique num passo para ver transações, recibo e checagens.",
         play: "Play", pause: "Pausar",
-        names: { "fork-success": "Sucesso", "fork-forced-failure": "Falha forçada → reversão", "fork-swap-failure": "Falha no swap → nova cotação → reversão", "fork-transient": "Falhas transitórias → retries", "fork-crash-resume": "Crash → resume", "pacific-success": "Pacific: sucesso", "pacific-forced-failure": "Pacific: falha forçada → reversão" },
-        forkBadge: "fork local da Pacific Mainnet", pacificBadge: "Pacific Mainnet",
+        names: { "atlantic-success": "Atlantic: sucesso", "atlantic-rollback": "Atlantic: falha forçada → reversão", "fork-success": "Sucesso", "fork-forced-failure": "Falha forçada → reversão", "fork-swap-failure": "Falha no swap → nova cotação → reversão", "fork-transient": "Falhas transitórias → retries", "fork-crash-resume": "Crash → resume", "pacific-success": "Pacific: sucesso", "pacific-forced-failure": "Pacific: falha forçada → reversão" },
+        forkBadge: "fork local da Pacific Mainnet", pacificBadge: "Pacific Mainnet", atlanticBadge: "Atlantic Testnet · transações reais",
         forward: "Passos", compensation: "Compensação (ordem inversa)",
         status: { pending: "pendente", running: "rodando", "waiting-gas": "esperando gás", submitted: "enviado", confirmed: "confirmado", verified: "verificado", skipped: "pulado", failed: "falhou", compensated: "desfeito" },
         pickStep: "Clique num passo para ver as transações, o recibo e as checagens.",
@@ -368,10 +368,11 @@
       const events = run.events.slice(0, k);
       const s = replay(events);
       const full = replay(run.events);
-      const pacific = full.network === "pacific";
+      const pacific = full.network !== "fork"; // pacific or atlantic: real chain, explorer links
+      const EXPLORER = EXPLORERS[full.network];
       const link = (h) => (pacific ? `<a class="hash" href="${EXPLORER}/tx/${esc(h)}" target="_blank" rel="noopener">${esc(h)}</a>` : `<span class="hash">${esc(h)}</span>`);
       $("seqNum").textContent = `${k} / ${run.events.length}`;
-      $("runHead").innerHTML = `<div class="row" style="margin-bottom:12px;gap:8px"><span class="tag ${pacific ? "ok" : "blue"}">${esc(pacific ? t.pacificBadge : t.forkBadge)}</span><span class="tag">${esc(full.id)}</span><span class="tag">${esc(short(full.account))}</span>${full.params.fail ? `<span class="tag bad">--fail ${esc(full.params.fail)}</span>` : ""}${full.injected.map((x) => `<span class="tag wait">⚡ ${esc(x.kind)}@${esc(x.step)}</span>`).join("")}</div>`;
+      $("runHead").innerHTML = `<div class="row" style="margin-bottom:12px;gap:8px"><span class="tag ${pacific ? "ok" : "blue"}">${esc(full.network === "atlantic" ? t.atlanticBadge : pacific ? t.pacificBadge : t.forkBadge)}</span><span class="tag">${esc(full.id)}</span><span class="tag">${esc(short(full.account))}</span>${full.params.fail ? `<span class="tag bad">--fail ${esc(full.params.fail)}</span>` : ""}${full.injected.map((x) => `<span class="tag wait">⚡ ${esc(x.kind)}@${esc(x.step)}</span>`).join("")}</div>`;
       $("now").textContent = `${t.nowLabel}: ${nowLine(s, t)}`;
 
       // lanes: forward + compensation (from the full run, so the layout does not jump while scrubbing)

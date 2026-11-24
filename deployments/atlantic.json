@@ -1,0 +1,33 @@
+{
+ "network": "Pharos Atlantic Testnet",
+ "chainId": 688689,
+ "usdc": "0x6ff683573da87b2833f42c30fc8cefb60ecd16e3",
+ "deployer": "0xdcA57Ed3CdC69629133496156213504C0eEa7CbE",
+ "txs": {
+  "deploy SagaWPHRS": "0x3dbbddabd3a10d546235c55e05f6d5724a9b2a7a8dd02c9503158db1c60dbe04",
+  "deploy SagaTestRouter": "0x08a63d77b0d58d20ab7896d24bdf8f68520b1e03501f91260a84b483f114e3ea",
+  "deploy SagaTestVault": "0xb98999e1d47728163285d379cd63796a835d71288fc7a4c10baf01c606239e2f",
+  "seed: wrap PHRS": "0x3a3e07d035d878ec0505eb986345f3347dafdd11ccdda407354542918dcca1a3",
+  "seed: WPHRS → pool": "0x3acd0ff626775e86744b40dc643130f5a234f9491aed9e325ba91ba2eabe3664",
+  "deploy SagaTestUSDC": "0x242e3a9834fab78255d48fe4dd1d3815a77fac722c6c712e09530be2953be787",
+  "mint tUSDC → deployer": "0x3bf39575cfe0874615b041136376957c61471f087811f8cae64781fc925d7416",
+  "mint tUSDC → x402 buyer": "0x966b2af8a88990d76cd3cdd78e31d46172eb416471adc747674bd00c81d22c8f",
+  "retire: WPHRS back from the old pool": "0xc62ae4dc302cd49461d88cf34ee5516c72f94b5a99a2446af53c790fa73e3d65",
+  "seed: tUSDC → pool": "0x163abdfddbc303c9a8d06871e10f8bcb7df92e397eac7a2298d0e5945db5d9a0"
+ },
+ "SagaWPHRS": "0x4c51c7424f7425f26bcf2e405a3e9ea82449f81f",
+ "SagaTestUSDC": "0x6ff683573da87b2833f42c30fc8cefb60ecd16e3",
+ "retired": {
+  "usdc": "0xcfC8330f4BCAB529c625D12781b1C19466A9Fc8B",
+  "SagaTestRouter": "0x18e0742770d4de25c70aea2a2e842ee28c346bd6",
+  "SagaTestVault": "0x8b887fe883872d7170642700e169898ba4011e6b",
+  "why": "built over Circle USDC; Circle's testnet faucet was under maintenance, so the saga uses SagaTestUSDC"
+ },
+ "SagaTestRouter": "0x5c05f3afd4104c04850f142d4104a54f3aba3ef8",
+ "SagaTestVault": "0xc4e75cc425111c917aafa52998079f932b4b4068",
+ "pool": {
+  "wphrs": "5000000000000000000",
+  "usdc": "200000000",
+  "priceUsdcPerPhrs": "40.0000"
+ }
+}

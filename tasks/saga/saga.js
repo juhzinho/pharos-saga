@@ -3,7 +3,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { isAddress, getAddress, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { ABI, FAROSWAP, TOKENS, VAULTS } from "../../lib/contracts.js";
+import { ABI, CHAIN_ID, FAROSWAP, SAGA_NET, TOKENS, VAULTS } from "../../lib/contracts.js";
+const DEFAULT_VAULT = Object.keys(VAULTS)[0];
 import { localSigner, NETWORKS, publicClientFor, readFees } from "../../lib/chain.js";
 import { DEFAULT_POLICY } from "../../lib/policy.js";
 import { Injector, runSaga } from "../../lib/engine.js";
@@ -29,7 +30,8 @@ Usage:
   npm run saga -- export <id> <name>   copy a run to public/runs/<name>.json for the web viewer
 
 Run options:
-  --network fork|pacific   fork (default) starts Anvil and uses a test account; pacific uses PRIVATE_KEY from .env
+  --network fork|atlantic|pacific   fork (default) starts Anvil and uses a test account; atlantic runs for real on
+                           Pharos Atlantic Testnet against the saga test contracts; pacific uses PRIVATE_KEY from .env
   --amount <PROS>          amount to put through the saga (default 2)
   --vault rock|sharp       RockawayX (default) or SharpByte USDC vault on Morpho
   --compensation unwind|park   on permanent failure: unwind back to PROS (default) or park in USDC
@@ -178,7 +180,7 @@ async function cmdCast() {
 function cmdStatus() {
   const id = resolveId(o.rest[0]);
   const state = replay(loadEvents(id));
-  console.log(renderStatus(state, { explorer: state.network === "pacific" }));
+  console.log(renderStatus(state, { explorer: state.network !== "fork" }));
 }
 
 async function cmdWatch() {
@@ -189,7 +191,7 @@ async function cmdWatch() {
     const events = loadEvents(id);
     for (; shown < events.length; shown++) {
       const state = replay(events.slice(0, shown + 1));
-      for (const line of renderEvent(events[shown], state, { explorer: state.network === "pacific" })) console.log(line);
+      for (const line of renderEvent(events[shown], state, { explorer: state.network !== "fork" })) console.log(line);
     }
     const st = replay(events).status;
     if (["completed", "compensated", "stuck"].includes(st)) return;
@@ -209,7 +211,8 @@ function cmdExport() {
 }
 
 async function setup(opts, existing) {
-  const network = NETWORKS[existing?.network ?? opts.network ?? "fork"] ?? fail("--network must be fork or pacific");
+  const network = NETWORKS[existing?.network ?? opts.network ?? "fork"] ?? fail("--network must be fork, atlantic or pacific");
+  if ((network.id === "atlantic") !== (SAGA_NET === "atlantic")) fail("an Atlantic saga needs --network atlantic on the command line");
   let fork = null;
   if (network.id === "fork") {
     fork = await startFork({ port: Number(new URL(network.rpc).port || 8545), detached: true });
@@ -222,19 +225,19 @@ async function setup(opts, existing) {
   const account = privateKeyToAccount(key);
   const client = publicClientFor(network);
   const chainId = await client.getChainId();
-  if (chainId !== 1672) fail(`${network.rpc} reports chain ${chainId}, expected Pharos Pacific (1672)`);
+  if (chainId !== CHAIN_ID) fail(`${network.rpc} reports chain ${chainId}, expected ${CHAIN_ID}`);
   return { network, fork, client, signer: localSigner(account, client) };
 }
 
 function printer(network) {
   return (entry, state) => {
-    for (const line of renderEvent(entry, state, { explorer: network.id === "pacific" })) console.log(line);
+    for (const line of renderEvent(entry, state, { explorer: network.id !== "fork" })) console.log(line);
   };
 }
 
 async function cmdRun() {
   const amountPros = amountArg();
-  const vault = VAULTS[o.vault ?? "rock"] ?? fail("--vault must be rock or sharp");
+  const vault = VAULTS[o.vault ?? DEFAULT_VAULT] ?? fail(`--vault must be ${Object.keys(VAULTS).join(" or ")}`);
   const compensation = o.compensation ?? "unwind";
   if (!["unwind", "park"].includes(compensation)) fail("--compensation must be unwind or park");
   if (o.fail && !FAIL_POINTS.includes(o.fail)) fail(`--fail must be ${FAIL_POINTS.join(" or ")}`);
@@ -250,8 +253,8 @@ async function cmdRun() {
   }
   const amount = parseEther(String(amountPros));
   const balance = await client.getBalance({ address: signer.address });
-  const reserve = parseEther("0.05");
-  if (balance < amount + reserve) fail(`${signer.address} has ${fmt.pros(balance)}; the saga needs ${fmt.pros(amount)} plus ~0.05 PROS for gas`);
+  const reserve = parseEther(network.id === "atlantic" ? "0.02" : "0.05");
+  if (balance < amount + reserve) fail(`${signer.address} has ${fmt.pros(balance)}; the saga needs ${fmt.pros(amount)} plus ~${fmt.pros(reserve)} for gas`);
   const asset = await client.readContract({ address: vault.address, abi: ABI.vault, functionName: "asset" });
   if (getAddress(asset) !== TOKENS.USDC.address) fail(`${vault.name} asset is ${asset}, not USDC`);
 
@@ -277,7 +280,7 @@ async function cmdResume() {
   const vault = Object.values(VAULTS).find((v) => v.address === prev.params.vault.address);
   const policy = { ...policyFrom(o), slippageBps: prev.params.slippageBps, maxFeeGwei: o.maxFee ? Number(o.maxFee) : prev.params.maxFeeGwei };
   const log = new StateLog({ sagaId: id, events, sink: fileSink(id), onChange: printer(network) });
-  console.log(renderStatus(prev, { explorer: network.id === "pacific" }) + "\n");
+  console.log(renderStatus(prev, { explorer: network.id !== "fork" }) + "\n");
   const mcp = network.id === "pacific" ? await chainMcpVerifier().catch(() => null) : null;
   const state = await runSaga({ client, signer, log, network, policy, inject: new Injector(Injector.parse(o.inject)), mcp, params: { amount: prev.params.amount, vault, compensation: prev.params.compensation, fail: prev.params.fail } });
   await mcp?.close();

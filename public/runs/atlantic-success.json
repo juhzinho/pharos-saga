@@ -1,0 +1,482 @@
+{
+ "name": "atlantic-success",
+ "id": "atlantic-success",
+ "events": [
+  {
+   "seq": 1,
+   "t": "2026-11-24T00:27:46.757Z",
+   "saga": "atlantic-success",
+   "event": "saga.start",
+   "network": "atlantic",
+   "account": "0xdcA57Ed3CdC69629133496156213504C0eEa7CbE",
+   "params": {
+    "amount": "50000000000000000",
+    "vault": {
+     "id": "test",
+     "name": "Saga Test USDC Vault (ERC-4626)",
+     "symbol": "stUSDC",
+     "address": "0xC4e75cc425111c917aaFA52998079F932b4B4068"
+    },
+    "slippageBps": 100,
+    "compensation": "unwind",
+    "fail": null,
+    "maxFeeGwei": 50,
+    "maxAttempts": 4,
+    "signer": "local-key"
+   },
+   "plan": [
+    {
+     "id": "wrap",
+     "title": "Wrap 0.05 PHRS into WPHRS"
+    },
+    {
+     "id": "approve-wpros",
+     "title": "Approve the saga test pool (0x5c05…3Ef8) to spend 0.05 WPHRS"
+    },
+    {
+     "id": "swap",
+     "title": "Swap 0.05 WPHRS → USDC on the saga test pool (0.3% pool 0x5c05…3Ef8)"
+    },
+    {
+     "id": "approve-usdc",
+     "title": "Approve Saga Test USDC Vault (ERC-4626) to spend the USDC received in step 3"
+    },
+    {
+     "id": "deposit",
+     "title": "Deposit the USDC received in step 3 into Saga Test USDC Vault (ERC-4626)"
+    }
+   ],
+   "start": {
+    "pros": "94994704446000000000",
+    "wpros": "0",
+    "usdc": "800000000",
+    "shares": "0"
+   }
+  },
+  {
+   "seq": 2,
+   "t": "2026-11-24T00:27:46.762Z",
+   "saga": "atlantic-success",
+   "event": "step.start",
+   "step": "wrap",
+   "attempt": 1,
+   "title": "Wrap 0.05 PHRS into WPHRS"
+  },
+  {
+   "seq": 3,
+   "t": "2026-11-24T00:27:47.534Z",
+   "saga": "atlantic-success",
+   "event": "step.simulated",
+   "step": "wrap",
+   "gasEstimate": "57699",
+   "gasLimit": "75008",
+   "note": null
+  },
+  {
+   "seq": 4,
+   "t": "2026-11-24T00:27:48.754Z",
+   "saga": "atlantic-success",
+   "event": "tx.sent",
+   "step": "wrap",
+   "hash": "0x4e12fee65ab711da6a8becf03119644e54150b39df97c4576f1303c9d5b6a8ec",
+   "nonce": 14,
+   "maxFeePerGas": "2000000000",
+   "maxPriorityFeePerGas": "0",
+   "gas": "75008",
+   "replaces": null,
+   "built": {
+    "to": "0x4c51C7424F7425F26bCf2e405A3e9ea82449F81F",
+    "data": "0xd0e30db0",
+    "value": "50000000000000000",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 5,
+   "t": "2026-11-24T00:27:50.794Z",
+   "saga": "atlantic-success",
+   "event": "receipt",
+   "step": "wrap",
+   "hash": "0x4e12fee65ab711da6a8becf03119644e54150b39df97c4576f1303c9d5b6a8ec",
+   "block": "33319461",
+   "gasUsed": "45043",
+   "effectiveGasPrice": "1000000000",
+   "status": "success"
+  },
+  {
+   "seq": 6,
+   "t": "2026-11-24T00:27:51.940Z",
+   "saga": "atlantic-success",
+   "event": "step.verified",
+   "step": "wrap",
+   "checks": [
+    {
+     "label": "WPROS Deposit event",
+     "ok": true,
+     "detail": "wad 50000000000000000"
+    },
+    {
+     "label": "WPROS balance +amount",
+     "ok": true,
+     "detail": "0 WPHRS → 0.05 WPHRS"
+    }
+   ],
+   "facts": {
+    "wrapped": "50000000000000000"
+   }
+  },
+  {
+   "seq": 7,
+   "t": "2026-11-24T00:27:51.942Z",
+   "saga": "atlantic-success",
+   "event": "step.start",
+   "step": "approve-wpros",
+   "attempt": 1,
+   "title": "Approve the saga test pool (0x5c05…3Ef8) to spend 0.05 WPHRS"
+  },
+  {
+   "seq": 8,
+   "t": "2026-11-24T00:27:53.040Z",
+   "saga": "atlantic-success",
+   "event": "step.simulated",
+   "step": "approve-wpros",
+   "gasEstimate": "58758",
+   "gasLimit": "76385",
+   "note": null
+  },
+  {
+   "seq": 9,
+   "t": "2026-11-24T00:27:54.060Z",
+   "saga": "atlantic-success",
+   "event": "tx.sent",
+   "step": "approve-wpros",
+   "hash": "0x61a7863421497f3fc55c5836b0cde0f8b86c1f75b300352957c59b8aad136b50",
+   "nonce": 15,
+   "maxFeePerGas": "2000000000",
+   "maxPriorityFeePerGas": "0",
+   "gas": "76385",
+   "replaces": null,
+   "built": {
+    "to": "0x4c51C7424F7425F26bCf2e405A3e9ea82449F81F",
+    "data": "0x095ea7b30000000000000000000000005c05f3afd4104c04850f142d4104a54f3aba3ef800000000000000000000000000000000000000000000000000b1a2bc2ec50000",
+    "value": "0",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 10,
+   "t": "2026-11-24T00:27:56.121Z",
+   "saga": "atlantic-success",
+   "event": "receipt",
+   "step": "approve-wpros",
+   "hash": "0x61a7863421497f3fc55c5836b0cde0f8b86c1f75b300352957c59b8aad136b50",
+   "block": "33319469",
+   "gasUsed": "45912",
+   "effectiveGasPrice": "1000000000",
+   "status": "success"
+  },
+  {
+   "seq": 11,
+   "t": "2026-11-24T00:27:56.673Z",
+   "saga": "atlantic-success",
+   "event": "step.verified",
+   "step": "approve-wpros",
+   "checks": [
+    {
+     "label": "Approval event WPROS → 0x5c05…3Ef8",
+     "ok": true,
+     "detail": "value 50000000000000000"
+    },
+    {
+     "label": "allowance at block 33319469",
+     "ok": true,
+     "detail": "50000000000000000 (expected 50000000000000000)"
+    }
+   ],
+   "facts": {}
+  },
+  {
+   "seq": 12,
+   "t": "2026-11-24T00:27:56.674Z",
+   "saga": "atlantic-success",
+   "event": "step.start",
+   "step": "swap",
+   "attempt": 1,
+   "title": "Swap 0.05 WPHRS → USDC on the saga test pool (0.3% pool 0x5c05…3Ef8)"
+  },
+  {
+   "seq": 13,
+   "t": "2026-11-24T00:27:57.973Z",
+   "saga": "atlantic-success",
+   "event": "step.simulated",
+   "step": "swap",
+   "gasEstimate": "90183",
+   "gasLimit": "117237",
+   "note": "quote 1.974316 USDC · min 1.954572 USDC"
+  },
+  {
+   "seq": 14,
+   "t": "2026-11-24T00:27:59.012Z",
+   "saga": "atlantic-success",
+   "event": "tx.sent",
+   "step": "swap",
+   "hash": "0xc028aea3b4f8568d1ad3fa78e59beea8b6352959163fa46e11e7434954029918",
+   "nonce": 16,
+   "maxFeePerGas": "2000000000",
+   "maxPriorityFeePerGas": "0",
+   "gas": "117237",
+   "replaces": null,
+   "built": {
+    "to": "0x5c05F3afd4104C04850f142d4104a54F3AbA3Ef8",
+    "data": "0xff84aafa0000000000000000000000004c51c7424f7425f26bcf2e405a3e9ea82449f81f0000000000000000000000006ff683573da87b2833f42c30fc8cefb60ecd16e300000000000000000000000000000000000000000000000000b1a2bc2ec5000000000000000000000000000000000000000000000000000000000000001e202c00000000000000000000000000000000000000000000000000000000001dd30c000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002600000000000000000000000000000000000000000000000000000000000000380000000000000000000000000000000000000000000000000000000006b04debc00000000000000000000000000000000000000000000000000000000000000010000000000000000000000005c05f3afd4104c04850f142d4104a54f3aba3ef800000000000000000000000000000000000000000000000000000000000000010000000000000000000000005c05f3afd4104c04850f142d4104a54f3aba3ef800000000000000000000000000000000000000000000000000000000000000020000000000000000000000005c05f3afd4104c04850f142d4104a54f3aba3ef80000000000000000000000005c05f3afd4104c04850f142d4104a54f3aba3ef80000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000600000000000000000000000004c51c7424f7425f26bcf2e405a3e9ea82449f81f0000000000000000000000006ff683573da87b2833f42c30fc8cefb60ecd16e30000000000000000000000000000000000000000000000000000000000000bb8000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "value": "0",
+    "note": "quote 1.974316 USDC · min 1.954572 USDC",
+    "meta": {
+     "quoted": "1974316",
+     "min": "1954572"
+    }
+   }
+  },
+  {
+   "seq": 15,
+   "t": "2026-11-24T00:28:01.057Z",
+   "saga": "atlantic-success",
+   "event": "receipt",
+   "step": "swap",
+   "hash": "0xc028aea3b4f8568d1ad3fa78e59beea8b6352959163fa46e11e7434954029918",
+   "block": "33319476",
+   "gasUsed": "60958",
+   "effectiveGasPrice": "1000000000",
+   "status": "success"
+  },
+  {
+   "seq": 16,
+   "t": "2026-11-24T00:28:02.049Z",
+   "saga": "atlantic-success",
+   "event": "step.verified",
+   "step": "swap",
+   "checks": [
+    {
+     "label": "WPROS left the wallet",
+     "ok": true,
+     "detail": "0.05 WPHRS"
+    },
+    {
+     "label": "USDC Transfer to the wallet",
+     "ok": true,
+     "detail": "1.974316 USDC"
+    },
+    {
+     "label": "received ≥ min (1.954572 USDC)",
+     "ok": true,
+     "detail": "received 1.974316 USDC (quote 1.974316 USDC)"
+    }
+   ],
+   "facts": {
+    "usdcOut": "1974316",
+    "swapQuote": "1974316"
+   }
+  },
+  {
+   "seq": 17,
+   "t": "2026-11-24T00:28:02.050Z",
+   "saga": "atlantic-success",
+   "event": "step.start",
+   "step": "approve-usdc",
+   "attempt": 1,
+   "title": "Approve Saga Test USDC Vault (ERC-4626) to spend 1.974316 USDC"
+  },
+  {
+   "seq": 18,
+   "t": "2026-11-24T00:28:03.171Z",
+   "saga": "atlantic-success",
+   "event": "step.simulated",
+   "step": "approve-usdc",
+   "gasEstimate": "58786",
+   "gasLimit": "76421",
+   "note": null
+  },
+  {
+   "seq": 19,
+   "t": "2026-11-24T00:28:04.199Z",
+   "saga": "atlantic-success",
+   "event": "tx.sent",
+   "step": "approve-usdc",
+   "hash": "0x8f2c989eba29a90006d1044200a407211d77c8f21a9d38a1478b68c4b5a78dab",
+   "nonce": 17,
+   "maxFeePerGas": "2000000000",
+   "maxPriorityFeePerGas": "0",
+   "gas": "76421",
+   "replaces": null,
+   "built": {
+    "to": "0x6Ff683573dA87b2833F42C30fC8cEFb60ecd16E3",
+    "data": "0x095ea7b3000000000000000000000000c4e75cc425111c917aafa52998079f932b4b406800000000000000000000000000000000000000000000000000000000001e202c",
+    "value": "0",
+    "note": null,
+    "meta": {}
+   }
+  },
+  {
+   "seq": 20,
+   "t": "2026-11-24T00:28:06.245Z",
+   "saga": "atlantic-success",
+   "event": "receipt",
+   "step": "approve-usdc",
+   "hash": "0x8f2c989eba29a90006d1044200a407211d77c8f21a9d38a1478b68c4b5a78dab",
+   "block": "33319482",
+   "gasUsed": "45935",
+   "effectiveGasPrice": "1000000000",
+   "status": "success"
+  },
+  {
+   "seq": 21,
+   "t": "2026-11-24T00:28:06.850Z",
+   "saga": "atlantic-success",
+   "event": "step.verified",
+   "step": "approve-usdc",
+   "checks": [
+    {
+     "label": "Approval event USDC → 0xC4e7…4068",
+     "ok": true,
+     "detail": "value 1974316"
+    },
+    {
+     "label": "allowance at block 33319482",
+     "ok": true,
+     "detail": "1974316 (expected 1974316)"
+    }
+   ],
+   "facts": {}
+  },
+  {
+   "seq": 22,
+   "t": "2026-11-24T00:28:06.850Z",
+   "saga": "atlantic-success",
+   "event": "step.start",
+   "step": "deposit",
+   "attempt": 1,
+   "title": "Deposit 1.974316 USDC into Saga Test USDC Vault (ERC-4626)"
+  },
+  {
+   "seq": 23,
+   "t": "2026-11-24T00:28:07.483Z",
+   "saga": "atlantic-success",
+   "event": "step.simulated",
+   "step": "deposit",
+   "gasEstimate": "138539",
+   "gasLimit": "180100",
+   "note": "assets 1.974316 USDC"
+  },
+  {
+   "seq": 24,
+   "t": "2026-11-24T00:28:08.503Z",
+   "saga": "atlantic-success",
+   "event": "tx.sent",
+   "step": "deposit",
+   "hash": "0x2129b439ccf6c7214303ad3cff532f480369c5e0f422df2d11c687b215844188",
+   "nonce": 18,
+   "maxFeePerGas": "2000000000",
+   "maxPriorityFeePerGas": "0",
+   "gas": "180100",
+   "replaces": null,
+   "built": {
+    "to": "0xC4e75cc425111c917aaFA52998079F932b4B4068",
+    "data": "0x6e553f6500000000000000000000000000000000000000000000000000000000001e202c000000000000000000000000dca57ed3cdc69629133496156213504c0eea7cbe",
+    "value": "0",
+    "note": "assets 1.974316 USDC",
+    "meta": {
+     "assets": "1974316"
+    }
+   }
+  },
+  {
+   "seq": 25,
+   "t": "2026-11-24T00:28:10.551Z",
+   "saga": "atlantic-success",
+   "event": "receipt",
+   "step": "deposit",
+   "hash": "0x2129b439ccf6c7214303ad3cff532f480369c5e0f422df2d11c687b215844188",
+   "block": "33319488",
+   "gasUsed": "104825",
+   "effectiveGasPrice": "1000000000",
+   "status": "success"
+  },
+  {
+   "seq": 26,
+   "t": "2026-11-24T00:28:12.153Z",
+   "saga": "atlantic-success",
+   "event": "step.verified",
+   "step": "deposit",
+   "checks": [
+    {
+     "label": "vault Deposit event",
+     "ok": true,
+     "detail": "assets 1.974316 USDC · shares 1974316000000000000"
+    },
+    {
+     "label": "share balance +shares",
+     "ok": true,
+     "detail": "0 stUSDC → 1.974316 stUSDC"
+    },
+    {
+     "label": "shares worth the deposit",
+     "ok": true,
+     "detail": "worth 1.974316 USDC"
+    }
+   ],
+   "facts": {
+    "shares": "1974316000000000000",
+    "sharesWorth": "1974316"
+   }
+  },
+  {
+   "seq": 27,
+   "t": "2026-11-24T00:28:15.256Z",
+   "saga": "atlantic-success",
+   "event": "saga.done",
+   "status": "completed",
+   "problem": null,
+   "end": {
+    "balances": {
+     "pros": "94944401773000000000",
+     "wpros": "0",
+     "usdc": "800000000",
+     "shares": "1974316000000000000"
+    },
+    "delta": {
+     "pros": "-50302673000000000",
+     "wpros": "0",
+     "usdc": "0",
+     "shares": "1974316000000000000"
+    },
+    "allowances": {
+     "wprosToFaroSwap": "0",
+     "usdcToFaroSwap": "0",
+     "usdcToVault": "0"
+    },
+    "gasWei": "302673000000000",
+    "marketCostWei": "0",
+    "invariants": [
+     {
+      "label": "vault shares received",
+      "ok": true
+     },
+     {
+      "label": "no USDC left behind",
+      "ok": true
+     },
+     {
+      "label": "no WPROS left behind",
+      "ok": true
+     },
+     {
+      "label": "no open allowances",
+      "ok": true
+     }
+    ]
+   }
+  }
+ ]
+}

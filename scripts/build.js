@@ -10,7 +10,7 @@ copyFileSync(join(root, "lib", "log.js"), join(root, "public", "lib", "log.js"))
 
 const runsDir = join(root, "public", "runs");
 mkdirSync(runsDir, { recursive: true });
-const ORDER = ["pacific-success", "pacific-forced-failure", "fork-success", "fork-forced-failure", "fork-transient", "fork-crash-resume", "fork-swap-failure"];
+const ORDER = ["atlantic-success", "atlantic-rollback", "pacific-success", "pacific-forced-failure", "fork-success", "fork-forced-failure", "fork-transient", "fork-crash-resume", "fork-swap-failure"];
 const runs = readdirSync(runsDir)
   .filter((f) => f.endsWith(".json") && f !== "index.json")
   .map((f) => {
